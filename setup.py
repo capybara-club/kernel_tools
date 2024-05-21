@@ -4,7 +4,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
-from build_config import NAME, INCLUDE_DIRS, SOURCES, EXTRA_COMPILE_ARGS
+from build_config import NAME, INCLUDE_DIRS, SOURCES, EXTRA_COMPILE_ARGS, EXTRA_LINK_ARGS
 
 this_dir = os.path.dirname(os.path.curdir)
 library_name = "kernel_tools"
@@ -21,7 +21,8 @@ def get_ext_modules():
                 name= NAME,
                 sources=SOURCES,
                 include_dirs=INCLUDE_DIRS,
-                extra_compile_args=EXTRA_COMPILE_ARGS
+                extra_compile_args=EXTRA_COMPILE_ARGS,
+                extra_link_args=EXTRA_LINK_ARGS,
             ),
         ]
 

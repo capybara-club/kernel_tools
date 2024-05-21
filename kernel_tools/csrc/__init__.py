@@ -1,3 +1,3 @@
-from .wrapper import tensor_test, warmup
+from .wrapper import tensor_test, warmup, mgSyevd, syevdx
 
-__all__ = ['tensor_test', 'warmup']
+# __all__ = ['tensor_test', 'warmup', 'mgSyevd', 'syevdx']
