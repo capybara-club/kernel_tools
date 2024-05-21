@@ -2,6 +2,7 @@
 requires = [
     "setuptools",
     "torch",
-    "numpy"
+    "numpy",
+    "ninja"
 ]
 build-backend = "setuptools.build_meta"

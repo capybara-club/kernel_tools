@@ -2,5 +2,5 @@
 #include <stdio.h>
 
 void tensor_test(torch::Tensor a) {
-    printf("something: %d\n", a.size(0)+10);
+    printf("something: %ld\n", a.size(0)+10);
 }

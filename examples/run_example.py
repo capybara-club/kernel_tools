@@ -1,3 +1,6 @@
-import kernel_tools.test
+import torch
 
-kernel_tools.test_2.test_kernel_tools()
+from kernel_tools import tensor_test
+
+a = torch.arange(10)
+tensor_test(a)

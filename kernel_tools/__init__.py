@@ -1,2 +1,3 @@
-import torch
-from . import _C, test, test_2
+from .csrc.wrapper import tensor_test
+
+__all__ = ['tensor_test']
