@@ -8,13 +8,11 @@ extensions_dir = os.path.join(this_dir, library_name, "csrc")
 
 USE_JIT = os.getenv('USE_KERNEL_TOOLS_JIT', '0') == '1'
 
-if not USE_JIT:
-    setup(
-        name='kernel_tools',
-        version='0.1',
-        description='PyTorch extension with C++ and CUDA',
-        packages=['kernel_tools'],
-        ext_modules=[
+def get_ext_modules():
+    if USE_JIT:
+        return []
+    else:
+        return [
             CUDAExtension(
                 name= "kernel_tools_cpp_cuda",
                 sources=[
@@ -24,8 +22,15 @@ if not USE_JIT:
                 include_dirs=['kernel_tools/csrc'],
                 extra_compile_args={'cxx': ['-g'], 'nvcc': ['-g']}
             ),
-        ],
-        cmdclass={
-            'build_ext': BuildExtension
-        }
-    )
+        ]
+
+setup(
+    name='kernel_tools',
+    version='0.1',
+    description='PyTorch extension with C++ and CUDA',
+    packages=['kernel_tools'],
+    ext_modules=get_ext_modules(),
+    cmdclass={
+        'build_ext': BuildExtension
+    }
+)
