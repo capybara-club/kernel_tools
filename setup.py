@@ -18,9 +18,7 @@ setup(
                 'kernel_tools/csrc/tensor_test.cpp', 
                 'kernel_tools/csrc/bindings.cpp',
             ],
-            include_dirs=[
-                extensions_dir
-            ],
+            include_dirs=['kernel_tools/csrc'],
             extra_compile_args={'cxx': ['-g'], 'nvcc': ['-g']}
         ),
     ],

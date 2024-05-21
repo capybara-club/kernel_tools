@@ -1,6 +1,6 @@
 #include <torch/extension.h>
 
-#include <tensor_test.h>
+#include "tensor_test.h"
 
 // void tensor_test(torch::Tensor a) {
 //     printf("tensor: %d\n", a.size(0)+10);
