@@ -1,27 +1,24 @@
 import torch
 from torch.utils.cpp_extension import load, load_inline
 import os
-
-USE_JIT = os.getenv('USE_KERNEL_TOOLS_JIT', '0') == '1'
+import sys
 
 # JIT Compilation
 def load_jit():
-    this_dir = os.path.dirname(os.path.curdir)
-    library_name = "kernel_tools"
-    extensions_dir = os.path.join(this_dir, library_name, "csrc")
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+    from build_config import NAME, INCLUDE_DIRS, SOURCES, EXTRA_COMPILE_ARGS
 
     kernel = load(
-        name="kernel_tools_cpp_cuda",
-        sources=[
-                'kernel_tools/csrc/tensor_test.cpp', 
-                'kernel_tools/csrc/bindings.cpp',
-        ],
-        extra_include_paths=["kernel_tools/csrc"],
-        extra_cflags=['-g'],
-        extra_cuda_cflags=['-g'],
+        name=NAME,
+        sources=SOURCES,
+        extra_include_paths=INCLUDE_DIRS,
+        extra_cflags=EXTRA_COMPILE_ARGS['cxx'],
+        extra_cuda_cflags=EXTRA_COMPILE_ARGS['nvcc'],
         verbose=True
     )
     return kernel
+
+USE_JIT = os.getenv('USE_KERNEL_TOOLS_JIT', '0') == '1'
 
 # Installation via pip
 if USE_JIT:
