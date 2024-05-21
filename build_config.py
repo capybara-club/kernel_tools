@@ -10,6 +10,7 @@ SOURCES = [
 ]
 
 USE_DEBUG = os.getenv('USE_KERNEL_TOOLS_DEBUG', '0') == '1'
+USE_VERBOSE = os.getenv('USE_KERNEL_TOOLS_VERBOSE', '0') == '1'
 
 def get_cxx_compile_args():
     if USE_DEBUG:
@@ -29,3 +30,5 @@ EXTRA_COMPILE_ARGS = {
     'cxx': get_cxx_compile_args(),
     'nvcc': get_nvcc_compile_args()
 }
+
+VERBOSE = USE_VERBOSE
