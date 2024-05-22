@@ -10,9 +10,9 @@ from kernel_tools.linalg import cusolver_eigh
 
 kernel_fn = lambda x, z: kernels.laplacian(x, z, bandwidth=20.)
 
-N = 2000
+N = 10
 D = 2
-top_q_eig = 100
+top_q_eig = 2
 
 a = torch.randn(N, D, dtype=torch.float64)
 

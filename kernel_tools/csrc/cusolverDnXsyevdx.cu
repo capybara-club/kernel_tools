@@ -61,6 +61,55 @@ CuSolverHandle& get_cusolver_dn_handle() {
 }
 
 template <typename data_type>
+void cusolverDnXsyevdx_workspace_template(
+    cusolverDnHandle_t handle,
+    cusolverEigMode_t jobz,
+    cusolverEigRange_t range,
+    cublasFillMode_t uplo,
+    int64_t N,
+    cudaDataType_t cuda_data_type,
+    int64_t lda,
+    int64_t il,
+    int64_t iu,
+    size_t *workspaceInBytesOnDevice,
+    size_t *workspaceInBytesOnHost
+) {
+
+    data_type vl;
+    data_type vu;
+    int64_t h_meig;
+
+    cusolverStatus_t status = cusolverDnXsyevdx_bufferSize(
+        handle,                     // handle
+        NULL,                       // params
+        jobz,                       // jobz
+        range,                      // range
+        uplo,                       // uplo
+        N,                          // N
+        cuda_data_type,             // dataTypeA
+        NULL,                       // A
+        lda,                        // lda
+        &vl,                        // vl
+        &vu,                        // vu
+        il,                         // il
+        iu,                         // iu
+        &h_meig,                    // h_meig
+        cuda_data_type,             // dataTypeW
+        NULL,                       // W
+        cuda_data_type,             // computeType
+        workspaceInBytesOnDevice,  // workspaceInBytesOnDevice
+        workspaceInBytesOnHost     // workspaceInBytesOnHost
+    );
+
+    if (status != CUSOLVER_STATUS_SUCCESS) {
+        std::cerr << "Failed to run cusolverDnXsyevdx_bufferSize: " << status << std::endl;
+        throw std::runtime_error("Failed to run cusolverDnXsyevdx_bufferSize");
+    }
+
+    printf("cusolverDnXsyevdx workspace requested: device: %zu bytes, host: %zu bytes\n", *workspaceInBytesOnDevice, *workspaceInBytesOnHost);
+}
+
+template <typename data_type>
 void cusolverDnXsyevdx_template(
     torch::Tensor a, 
     torch::Tensor w,
@@ -83,8 +132,8 @@ void cusolverDnXsyevdx_template(
 
     cusolverDnSetStream(handle, stream);
 
-    size_t worksize_device;
-    size_t worksize_host;
+    size_t workspaceInBytesOnDevice;
+    size_t workspaceInBytesOnHost;
 
     cusolverStatus_t status;
 
@@ -103,37 +152,14 @@ void cusolverDnXsyevdx_template(
 
     int64_t h_meig = 0;
 
-    status = cusolverDnXsyevdx_bufferSize(
-        handle,                     // handle
-        NULL,                       // params
-        jobz,                       // jobz
-        range,                      // range
-        uplo,                       // uplo
-        N,                          // N
-        data_type_a,                // dataTypeA
-        NULL,                       // A
-        lda,                        // lda
-        &vl,                        // vl
-        &vu,                        // vu
-        (int64_t)il,                // il
-        (int64_t)iu,                // iu
-        &h_meig,                    // h_meig
-        data_type_w,                // dataTypeW
-        NULL,                       // W
-        compute_type,               // computeType
-        &worksize_device,           // workspaceInBytesOnDevice
-        &worksize_host              // workspaceInBytesOnHost
+    cusolverDnXsyevdx_workspace_template<data_type>(
+        handle, jobz, range, uplo, N, cuda_data_type, lda, il, iu, &workspaceInBytesOnDevice, &workspaceInBytesOnHost
     );
 
-    if (status != CUSOLVER_STATUS_SUCCESS) {
-        std::cerr << "Failed to run cusolverDnXsyevdx_bufferSize: " << status << std::endl;
-        throw std::runtime_error("Failed to run cusolverDnXsyevdx_bufferSize");
-    }
+    printf("cusolverDnXsyevdx workspace requested: device: %zu bytes, host: %zu bytes\n", workspaceInBytesOnDevice, workspaceInBytesOnHost);
 
-    printf("cusolverDnXsyevdx workspace requested: device: %zu bytes, host: %zu bytes\n", worksize_device, worksize_host);
-
-    void *cuda_data = cuda_alloc(worksize_device);
-    void *host_data = host_alloc(worksize_host);
+    void *cuda_data = cuda_alloc(workspaceInBytesOnDevice);
+    void *host_data = host_alloc(workspaceInBytesOnHost);
 
     status = cusolverDnXsyevdx(
         handle,
@@ -154,9 +180,9 @@ void cusolverDnXsyevdx_template(
         w.data_ptr<data_type>(),
         compute_type,
         cuda_data,
-        worksize_device,
+        workspaceInBytesOnDevice,
         host_data,
-        worksize_host,
+        workspaceInBytesOnHost,
         info.data_ptr<int>()
     );
 
@@ -195,3 +221,4 @@ void cusolverDnXsyevdx_export(
     // If it gets here the dtype isn't supported
     throw std::runtime_error("Tensor needs to have dtype either float32 or float64");
 }
+

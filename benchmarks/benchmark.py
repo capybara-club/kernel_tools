@@ -21,6 +21,7 @@ def profile(N, num_eigs, dtype):
     kernel_mat_cpu = kernel_mat.cpu()
     cuda_time = None
     scipy_time = None
+    
 
     try:
         start = time.time()
@@ -46,5 +47,3 @@ for dtype in n_dtypes:
         cuda_time, scipy_time = profile(N, num_eigs, dtype)
 
         print(f'N:{N}, num_eigs:{num_eigs}, dtype:{dtype}, cuda_time:{cuda_time}, scipy_time:{scipy_time}')
-        # print(cuda_time)
-        # print(scipy_time)
