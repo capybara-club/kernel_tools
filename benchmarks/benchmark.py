@@ -19,11 +19,16 @@ def profile(N, num_eigs, dtype):
     overwrite_a = True
     kernel_mat_cuda = kernel_mat.to(device='cuda')
     kernel_mat_cpu = kernel_mat.cpu()
+    cuda_time = None
+    scipy_time = None
 
-    start = time.time()
-    cuda_eigenvalues, cuda_eigenvectors = cusolver_eigh(kernel_mat_cuda, subset_by_index=subset_by_index, eigvals_only=eigvals_only, overwrite_a=overwrite_a)
-    end = time.time()
-    cuda_time = end - start
+    try:
+        start = time.time()
+        cuda_eigenvalues, cuda_eigenvectors = cusolver_eigh(kernel_mat_cuda, subset_by_index=subset_by_index, eigvals_only=eigvals_only, overwrite_a=overwrite_a)
+        end = time.time()
+        cuda_time = end - start
+    except:
+        print('out of memory')
 
     start = time.time()
     scipy_eigenvalues, scipy_eigenvectors = scipy_eigh(kernel_mat_cpu, subset_by_index=subset_by_index, eigvals_only=eigvals_only, overwrite_a=overwrite_a)
@@ -32,8 +37,8 @@ def profile(N, num_eigs, dtype):
 
     return cuda_time, scipy_time
 
-n_sizes = [100, 1_000, 2_000, 5_000, 10_000, 20_000]
-n_eigs = [10, 50, 100, 200, 500, 1_000]
+n_sizes = [100, 1_000, 2_000, 5_000, 10_000, 15_000, 20_000, 25_000, 30_000]
+n_eigs =  [ 10,    50,   100,   200,    500,    750,  1_000,  2_000, 3_000]
 n_dtypes = [torch.float32, torch.float64]
 
 for dtype in n_dtypes:
