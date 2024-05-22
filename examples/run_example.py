@@ -1,21 +1,22 @@
 import torch
 import scipy as sp
+import time
 
-from kernel_tools import warmup, mgSyevd, syevdx
 import kernel_tools.kernels as kernels
+from kernel_tools.linalg import cusolver_eigh
 
 torch.set_printoptions(linewidth=240)
 
 kernel_fn = lambda x, z: kernels.laplacian(x, z, bandwidth=20.)
 
-warmup()
+# warmup()
 # a = torch.arange(10)
 
-N = 5
+N = 14000
 D = 2
-num_eigs = 2
+num_eigs = 100
 
-a = torch.randn(N, D, dtype=torch.float64)
+a = torch.randn(N, D, dtype=torch.float32)
 
 kernel_mat = kernel_fn(a,a)
 print(kernel_mat)
@@ -39,16 +40,23 @@ kernel_mat_cuda = kernel_mat.to(device='cuda')
 # cuda_eigenvalues, cuda_eigenvectors = syevdx(kernel_mat.to(dtype=torch.float32), cuda_sub_start, cuda_sub_end)
 # print(cuda_eigenvalues)
 
-print(kernel_mat_cuda)
-cuda_eigenvalues, cuda_eigenvectors = syevdx(kernel_mat_cuda.to(dtype=torch.float64), subset_by_index=subset_by_index, eigvals_only=eigvals_only, overwrite_a=overwrite_a)
+# print(kernel_mat_cuda)
+start = time.time()
+cuda_eigenvalues, cuda_eigenvectors = cusolver_eigh(kernel_mat_cuda.to(dtype=torch.float32), subset_by_index=subset_by_index, eigvals_only=eigvals_only, overwrite_a=overwrite_a)
 print(cuda_eigenvalues)
-print(cuda_eigenvectors)
+end = time.time()
+print(end - start)
 
-print(kernel_mat_cuda)
+# print(cuda_eigenvectors)
+
+# print(kernel_mat_cuda)
 kernel_mat_cpu = kernel_mat.cpu()
+start = time.time()
 scipy_eigenvalues, scipy_eigenvectors = sp.linalg.eigh(kernel_mat_cpu, subset_by_index=subset_by_index, eigvals_only=eigvals_only, overwrite_a=overwrite_a)
 print(scipy_eigenvalues)
-print(scipy_eigenvectors)
-print(kernel_mat_cpu)
+end = time.time()
+print(end - start)
+# print(scipy_eigenvectors)
+# print(kernel_mat_cpu)
 # print(kernel_mat)
 # print(d)
