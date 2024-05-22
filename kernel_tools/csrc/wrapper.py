@@ -56,9 +56,7 @@ class SingletonClass:
 def warmup():
     SingletonClass()
 
-#TODO: need to handle triangle non-sense with row-major and strange strides
-#TODO: handle output tensor and let it be a to avoid allocate
-#TODO: specify range from python
+#TODO: need to check triangle non-sense with row-major and strange strides
 #TODO: able to switch to eigenvalue only mode
 # On info from docs:
 # If output parameter info = -i (less than zero), the i-th parameter is wrong (not counting handle).
@@ -69,24 +67,32 @@ def warmup():
 # If out is a, we don't have to do a clone, these functions are meant to 
 # write in place.
 
-def syevdx(a, num_eigs, out=None, is_upper_triangle=True):
+def syevdx(a, il, iu, is_upper_triangle=True, eigenvalues_only=False):
+
+    if not a.is_cuda:
+        raise ValueError(f"a is not on a device")
+
+    if a.dim() != 2:
+        raise ValueError(f"a matrix is not two dimensional")
+    
+    if a.shape[0] != a.shape[1]:
+        raise ValueError(f"a matrix must be square")
+
+    if a.dtype != torch.float32 and a.dtype != torch.float64:
+        raise ValueError(f"a matrix must be float32 or float64")
+
     w = torch.zeros(a.size(0), dtype=a.dtype, device=a.device)
     info = torch.scalar_tensor(-1, device=a.device, dtype=torch.int)
-    if out is None:
-        out = a.clone()
-    elif a is not out:
-        if (a.shape != out.shape):
-            raise ValueError("shape of a and out don't match")
-        out.copy_(a)
 
     stream = cuda.current_stream()
 
-    SingletonClass().kernel.cusolverDnXsyevdx_export(out, w, info, num_eigs, is_upper_triangle, stream.cuda_stream)
+    SingletonClass().kernel.cusolverDnXsyevdx_export(a, w, info, il, iu, is_upper_triangle, eigenvalues_only, stream.cuda_stream)
 
     cpu_info = info.cpu()
     if cpu_info != 0:
         raise ValueError(f"info of syevdx is not equal to 0: {cpu_info}. Check cusolver docs")
-    return out, w
+    
+    return w
 
 def mgSyevd(a, d):
     return SingletonClass().kernel.cusolverMgSyevd_export(a, d)

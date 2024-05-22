@@ -1,0 +1,4 @@
+from .csrc.wrapper import mgSyevd, syevdx
+
+def top_eig(a, num_eigs):
+    

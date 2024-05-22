@@ -6,7 +6,6 @@ SRC_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'kernel_tools/
 INCLUDE_DIRS = [SRC_DIR]
 SOURCES = [
     os.path.join(SRC_DIR, 'bindings.cpp'),
-    os.path.join(SRC_DIR, 'tensor_test.cpp'),
     os.path.join(SRC_DIR, 'cusolverDnXsyevdx.cu'),
     os.path.join(SRC_DIR, 'cusolverMgSyevd.cu'),
     os.path.join(SRC_DIR, 'utils.cu'),

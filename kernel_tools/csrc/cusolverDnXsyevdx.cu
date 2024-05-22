@@ -65,14 +65,17 @@ void cusolverDnXsyevdx_template(
     torch::Tensor a, 
     torch::Tensor w,
     torch::Tensor info,
-    int num_eigs,
+    int il,
+    int iu,
     bool upper_triangle,
+    bool eigenvalues_only,
     uintptr_t stream_ptr,
     cudaDataType_t cuda_data_type
 ) {
     cusolverDnHandle_t handle = get_cusolver_dn_handle().get();
     // because pytorch is row major and cublas is column major, the triangle is flipped
     cublasFillMode_t uplo = upper_triangle ? CUBLAS_FILL_MODE_LOWER : CUBLAS_FILL_MODE_UPPER;
+    cusolverEigMode_t jobz = eigenvalues_only ? CUSOLVER_EIG_MODE_NOVECTOR : CUSOLVER_EIG_MODE_VECTOR;
 
     cudaStream_t stream = reinterpret_cast<cudaStream_t>(stream_ptr);
 
@@ -96,14 +99,12 @@ void cusolverDnXsyevdx_template(
     data_type vl;
     data_type vu;
 
-    int64_t il = N - int64_t(num_eigs);
-    int64_t iu = N;
     int64_t h_meig = 0;
 
     status = cusolverDnXsyevdx_bufferSize(
         handle,                     // handle
         NULL,                       // params
-        CUSOLVER_EIG_MODE_VECTOR,   // jobz
+        jobz,                       // jobz
         CUSOLVER_EIG_RANGE_I,       // range
         uplo,                       // uplo
         N,                          // N
@@ -112,8 +113,8 @@ void cusolverDnXsyevdx_template(
         lda,                        // lda
         &vl,                        // vl
         &vu,                        // vu
-        il,                         // il
-        iu,                         // iu
+        (int64_t)il,                // il
+        (int64_t)iu,                // iu
         &h_meig,                    // h_meig
         data_type_w,                // dataTypeW
         NULL,                       // W
@@ -135,7 +136,7 @@ void cusolverDnXsyevdx_template(
     status = cusolverDnXsyevdx(
         handle,
         NULL,
-        CUSOLVER_EIG_MODE_VECTOR,
+        jobz,
         CUSOLVER_EIG_RANGE_I,
         uplo,
         N,
@@ -144,8 +145,8 @@ void cusolverDnXsyevdx_template(
         lda,
         &vl,
         &vu,
-        il,
-        iu,
+        (int64_t)il,
+        (int64_t)iu,
         &h_meig,
         data_type_w,
         w.data_ptr<data_type>(),
@@ -170,8 +171,10 @@ void cusolverDnXsyevdx_export(
     torch::Tensor a, 
     torch::Tensor w,
     torch::Tensor info,
-    int num_eigs,
+    int il,
+    int iu,
     bool upper_triangle,
+    bool eigenvalues_only,
     uintptr_t stream_ptr
 ) {
     if (!a.is_cuda()) {
@@ -184,13 +187,13 @@ void cusolverDnXsyevdx_export(
 
     if (a.dtype() == torch::kFloat32) {
         return cusolverDnXsyevdx_template<float>(
-            a, w, info, num_eigs, upper_triangle, stream_ptr, CUDA_R_32F
+            a, w, info, il, iu, upper_triangle, eigenvalues_only, stream_ptr, CUDA_R_32F
         );
     } 
 
     if (a.dtype() == torch::kFloat64) {
         return cusolverDnXsyevdx_template<double>(
-            a, w, info, num_eigs, upper_triangle, stream_ptr, CUDA_R_64F
+            a, w, info, il, iu, upper_triangle, eigenvalues_only, stream_ptr, CUDA_R_64F
         );
     }
 
