@@ -10,7 +10,7 @@ from kernel_tools.linalg import cusolver_eigh, cusolver_mg_eigh
 
 kernel_fn = lambda x, z: kernels.laplacian(x, z, bandwidth=20.)
 
-N = 10
+N = 20000
 D = 2
 
 a = torch.randn(N, D, dtype=torch.float64)
