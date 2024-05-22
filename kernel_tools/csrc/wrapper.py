@@ -151,5 +151,12 @@ def syevdx(
         else:
             return w, out
 
-def mgSyevd(a, d):
-    return SingletonClass().kernel.cusolverMgSyevd_export(a, d)
+def mgSyevd(a, overwrite_a = False):
+    N = a.size(0)
+    d = torch.zeros(N, dtype=a.dtype, device=a.device)
+    if not overwrite_a:
+        out = a.clone()
+    else:
+        out = a
+    SingletonClass().kernel.cusolverMgSyevd_export(out, d)
+    return d, out.T

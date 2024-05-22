@@ -39,3 +39,23 @@ def cusolver_eigh(
                   lower=lower, 
                   eigvals_only=eigvals_only
             )
+
+def cusolver_mg_eigh(
+    a,
+    overwrite_a = False
+):
+    """
+    Uses cusolver cusolverMgsyevd to get all of the eigenvalues and eigenvectors of
+    a system. It uses all nvidia devices visible to split the compute work and share 
+    the working space. The base call of this function overwrites the eigenvectors in 
+    to the 'a' matrix. When 'overwrite_a' is True, the vectors are returned in to 
+    the passed in 'a' matrix
+
+    Parameters:
+    a (torch::Tensor): The matrix
+    overwrite_a: Avoids a copy of the a tensor when true
+    
+    Returns:
+    eigenvalues, eigenvectors
+    """
+    return mgSyevd(a, overwrite_a=overwrite_a)

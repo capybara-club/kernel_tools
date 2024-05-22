@@ -4,7 +4,7 @@ import time
 from scipy.linalg import eigh as scipy_eigh
 
 import kernel_tools.kernels as kernels
-from kernel_tools.linalg import cusolver_eigh
+from kernel_tools.linalg import cusolver_eigh, cusolver_mg_eigh
 
 # torch.set_printoptions(linewidth=240)
 
@@ -36,6 +36,12 @@ print(cuda_eigenvalues)
 print('cuda eigenvectors:')
 print(cuda_eigenvectors)
 print(end - start)
+
+kernel_mat_mg = kernel_mat_cpu.clone()
+cuda_mg_eigenvalues, cuda_mg_eigenvectors = cusolver_mg_eigh(kernel_mat_mg)
+print(cuda_mg_eigenvalues)
+print(cuda_mg_eigenvectors)
+exit()
 
 start = time.time()
 scipy_eigenvalues, scipy_eigenvectors = scipy_eigh(kernel_mat_cpu, subset_by_index=subset_by_index, eigvals_only=eigvals_only, overwrite_a=overwrite_a)
