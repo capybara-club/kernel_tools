@@ -69,12 +69,14 @@ void cusolverDnXsyevdx_template(
     int iu,
     bool upper_triangle,
     bool eigenvalues_only,
+    bool eigen_range,
     uintptr_t stream_ptr,
     cudaDataType_t cuda_data_type
 ) {
     cusolverDnHandle_t handle = get_cusolver_dn_handle().get();
     // because pytorch is row major and cublas is column major, the triangle is flipped
-    cublasFillMode_t uplo = upper_triangle ? CUBLAS_FILL_MODE_LOWER : CUBLAS_FILL_MODE_UPPER;
+    cusolverEigRange_t range = eigen_range ? CUSOLVER_EIG_RANGE_I : CUSOLVER_EIG_RANGE_ALL;
+    cublasFillMode_t uplo = upper_triangle ? CUBLAS_FILL_MODE_UPPER : CUBLAS_FILL_MODE_LOWER;
     cusolverEigMode_t jobz = eigenvalues_only ? CUSOLVER_EIG_MODE_NOVECTOR : CUSOLVER_EIG_MODE_VECTOR;
 
     cudaStream_t stream = reinterpret_cast<cudaStream_t>(stream_ptr);
@@ -105,7 +107,7 @@ void cusolverDnXsyevdx_template(
         handle,                     // handle
         NULL,                       // params
         jobz,                       // jobz
-        CUSOLVER_EIG_RANGE_I,       // range
+        range,                      // range
         uplo,                       // uplo
         N,                          // N
         data_type_a,                // dataTypeA
@@ -137,7 +139,7 @@ void cusolverDnXsyevdx_template(
         handle,
         NULL,
         jobz,
-        CUSOLVER_EIG_RANGE_I,
+        range,
         uplo,
         N,
         data_type_a,
@@ -175,25 +177,18 @@ void cusolverDnXsyevdx_export(
     int iu,
     bool upper_triangle,
     bool eigenvalues_only,
+    bool eigen_range,
     uintptr_t stream_ptr
 ) {
-    if (!a.is_cuda()) {
-        throw std::runtime_error("All tensors must be on the CUDA device.");
-    }
-
-    if (a.size(0) != a.size(1)) {
-        throw std::runtime_error("Tensor is not square");
-    }
-
     if (a.dtype() == torch::kFloat32) {
         return cusolverDnXsyevdx_template<float>(
-            a, w, info, il, iu, upper_triangle, eigenvalues_only, stream_ptr, CUDA_R_32F
+            a, w, info, il, iu, upper_triangle, eigenvalues_only, eigen_range, stream_ptr, CUDA_R_32F
         );
     } 
 
     if (a.dtype() == torch::kFloat64) {
         return cusolverDnXsyevdx_template<double>(
-            a, w, info, il, iu, upper_triangle, eigenvalues_only, stream_ptr, CUDA_R_64F
+            a, w, info, il, iu, upper_triangle, eigenvalues_only, eigen_range, stream_ptr, CUDA_R_64F
         );
     }
 

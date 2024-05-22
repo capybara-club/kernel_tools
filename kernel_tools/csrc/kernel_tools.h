@@ -10,6 +10,7 @@ void cusolverDnXsyevdx_export(
     int iu,
     bool upper_triangle,
     bool eigenvalues_only,
+    bool eigen_range,
     uintptr_t stream_ptr
 );
 

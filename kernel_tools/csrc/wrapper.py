@@ -67,7 +67,16 @@ def warmup():
 # If out is a, we don't have to do a clone, these functions are meant to 
 # write in place.
 
-def syevdx(a, il, iu, is_upper_triangle=True, eigenvalues_only=False):
+# indices are 1 indexed
+
+# Trying to match scipy eigh
+def syevdx(
+        a,
+        overwrite_a = False,
+        subset_by_index = None, 
+        lower = True, 
+        eigvals_only = False
+):
 
     if not a.is_cuda:
         raise ValueError(f"a is not on a device")
@@ -80,19 +89,67 @@ def syevdx(a, il, iu, is_upper_triangle=True, eigenvalues_only=False):
 
     if a.dtype != torch.float32 and a.dtype != torch.float64:
         raise ValueError(f"a matrix must be float32 or float64")
+    
+    N = a.shape[0]
+
+    # cusolver is 1 indexed
+    il_one_indexed = 0
+    iu_one_indexed = 0
+    eigenvalue_range = False
+    total_eigenvalues = N
+
+    if subset_by_index is not None:
+        il, iu = subset_by_index
+        #TODO: test scipy on ranges and see what they do
+        if il > iu or il < 0 or il > N or iu < 0 or iu > N:
+            raise ValueError(f"eigval index range is out of bounds")
+        
+        il_one_indexed = il + 1
+        iu_one_indexed = iu + 1
+        eigenvalue_range = True
+        total_eigenvalues = iu_one_indexed - il_one_indexed + 1
+        
+    if not overwrite_a:
+        out = a.clone()
+    else:
+        out = a
 
     w = torch.zeros(a.size(0), dtype=a.dtype, device=a.device)
     info = torch.scalar_tensor(-1, device=a.device, dtype=torch.int)
 
+    # cusolver and cublas are column_major not row_major
+    is_upper_triangle_column_major = lower
+
     stream = cuda.current_stream()
 
-    SingletonClass().kernel.cusolverDnXsyevdx_export(a, w, info, il, iu, is_upper_triangle, eigenvalues_only, stream.cuda_stream)
+    SingletonClass().kernel.cusolverDnXsyevdx_export(
+        out, 
+        w, 
+        info, 
+        il_one_indexed, 
+        iu_one_indexed, 
+        is_upper_triangle_column_major, 
+        eigvals_only, 
+        eigenvalue_range, 
+        stream.cuda_stream
+    )
 
     cpu_info = info.cpu()
     if cpu_info != 0:
         raise ValueError(f"info of syevdx is not equal to 0: {cpu_info}. Check cusolver docs")
     
-    return w
+    if eigenvalue_range:
+        w = w[: total_eigenvalues].clone()
+        if eigvals_only:
+            return w
+        else:
+            out = out[: total_eigenvalues].T
+            return w, out
+    else:
+        if eigvals_only:
+            return w
+        else:
+            return w, out
 
 def mgSyevd(a, d):
     return SingletonClass().kernel.cusolverMgSyevd_export(a, d)
