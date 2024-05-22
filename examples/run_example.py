@@ -12,7 +12,7 @@ kernel_fn = lambda x, z: kernels.laplacian(x, z, bandwidth=20.)
 # warmup()
 # a = torch.arange(10)
 
-N = 14000
+N = 20000
 D = 2
 num_eigs = 100
 

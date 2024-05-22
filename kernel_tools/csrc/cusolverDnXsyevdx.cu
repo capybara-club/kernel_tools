@@ -130,7 +130,7 @@ void cusolverDnXsyevdx_template(
         throw std::runtime_error("Failed to run cusolverDnXsyevdx_bufferSize");
     }
 
-    printf("workspace: %zu, %zu\n", worksize_device, worksize_host);
+    printf("cusolverDnXsyevdx workspace requested: device: %zu bytes, host: %zu bytes\n", worksize_device, worksize_host);
 
     void *cuda_data = cuda_alloc(worksize_device);
     void *host_data = host_alloc(worksize_host);
