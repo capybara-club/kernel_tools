@@ -16,7 +16,7 @@ device_bytes, host_bytes = cusolver_eigh_workspace_requirements(N, torch.float64
 print(f'device_bytes: {device_bytes}')
 print(f'host_bytes: {host_bytes}')
 
-device_elements = cusolver_mg_eigh_workspace_requirements(N, torch.float64, verbose=True, num_devices=8)
+device_elements = cusolver_mg_eigh_workspace_requirements(N, torch.float64, verbose=True, num_devices=None)
 print(f'device_elements: {device_elements}')
 # exit()
 exit()

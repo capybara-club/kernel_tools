@@ -72,7 +72,7 @@ def cusolver_mg_eigh(
 
     Parameters:
     a (torch::Tensor): The matrix
-    overwrite_a: Avoids a copy of the a tensor when true
+    overwrite_a: Avoids a copy of the 'a' tensor when true
     
     Returns:
     eigenvalues, eigenvectors

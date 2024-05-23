@@ -75,7 +75,6 @@ void cusolverMgSyevd_workspace_template(
 
     const int MAX_NUM_DEVICES = 16;
 
-    int nbGpus = 0;
     std::vector<int> deviceList(MAX_NUM_DEVICES);
 
     const int IA = 1;
@@ -93,10 +92,11 @@ void cusolverMgSyevd_workspace_template(
 
     CUSOLVER_CHECK( cusolverMgCreate(&cusolverH) );
 
-    CUDA_CHECK( cudaGetDeviceCount(&nbGpus) );
-
-    nbGpus = (nbGpus < MAX_NUM_DEVICES) ? nbGpus : MAX_NUM_DEVICES;
+    int nbGpus = num_devices;
     if (use_num_devices_visible) {
+        CUDA_CHECK( cudaGetDeviceCount(&nbGpus) );
+
+        nbGpus = (nbGpus < MAX_NUM_DEVICES) ? nbGpus : MAX_NUM_DEVICES;
         if (verbose) std::printf("\tThere are %d GPUs \n", nbGpus);
         for (int j = 0; j < nbGpus; j++) {
             deviceList[j] = j;
@@ -104,14 +104,9 @@ void cusolverMgSyevd_workspace_template(
             CUDA_CHECK( cudaGetDeviceProperties(&prop, j) );
             if (verbose) std::printf("\tDevice %d, %s, cc %d.%d \n", j, prop.name, prop.major, prop.minor);
         }
-    } else {
-        nbGpus = num_devices;
     }
 
     CUSOLVER_CHECK( cusolverMgDeviceSelect(cusolverH, nbGpus, deviceList.data()) );
-
-    // CUDA_CHECK( enablePeerAccess(nbGpus, deviceList.data()) );
-
     CUSOLVER_CHECK( cusolverMgCreateDeviceGrid(&gridA, 1, nbGpus, deviceList.data(), mapping) );
 
     /* (global) A is N-by-N */
