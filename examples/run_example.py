@@ -10,7 +10,7 @@ from kernel_tools.linalg import cusolver_eigh, cusolver_mg_eigh, cusolver_eigh_w
 
 kernel_fn = lambda x, z: kernels.laplacian(x, z, bandwidth=20.)
 
-N = 2_000
+N = 5000
 
 device_bytes, host_bytes = cusolver_eigh_workspace_requirements(N, torch.float64)
 print(f'device_bytes: {device_bytes}')
@@ -31,7 +31,7 @@ sub_end = N - 1
 
 subset_by_index = (sub_start, sub_end)
 eigvals_only = False
-overwrite_a = True
+overwrite_a = False
 
 kernel_mat_cuda = kernel_mat.to(device='cuda')
 kernel_mat_cpu = kernel_mat.cpu()

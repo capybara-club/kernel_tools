@@ -89,8 +89,8 @@ void cusolverMgSyevd_template(
 
     cusolverEigMode_t jobz = CUSOLVER_EIG_MODE_VECTOR;
 
-    cudaLibMgMatrixDesc_t descrA;
-    cudaLibMgGrid_t gridA;
+    cudaLibMgMatrixDesc_t descrA = NULL;
+    cudaLibMgGrid_t gridA = NULL;
     cusolverMgGridMapping_t mapping = CUDALIBMG_GRID_MAPPING_COL_MAJOR;
 
     int64_t lwork = 0; /* workspace: number of elements per device */
@@ -218,7 +218,6 @@ void cusolverMgSyevd_template(
         if (0 > info) {
             // Break here and check info after everything is freed
             break;
-            // throw std::runtime_error("cusolverMgSyevd info is wrong, see documentation");
         }
 
         if (verbose) std::printf("Step 10: Copy eigenvectors to A and eigenvalues to D\n");
@@ -247,6 +246,24 @@ void cusolverMgSyevd_template(
 
     CUDA_CHECK(destroyMat_status);
     CUDA_CHECK(workspaceFree_status);
+
+    if (descrA != NULL) {
+        CUSOLVER_CHECK(
+            cusolverMgDestroyMatrixDesc(descrA)
+        );
+    }
+
+    if (gridA != NULL) {
+        CUSOLVER_CHECK(
+            cusolverMgDestroyGrid(gridA)
+        );
+    }
+
+    if (cusolverH != NULL) {
+        CUSOLVER_CHECK(
+            cusolverMgDestroy(cusolverH)
+        );
+    }
 
     if (0 > info) {
         char buffer[100];
