@@ -1,4 +1,4 @@
-from .csrc.wrapper import mgSyevd, syevdx, syevdx_workspace_query
+from .csrc.wrapper import mgSyevd, syevdx, syevdx_workspace_query, mgSyevd_workspace_query
 
 def cusolver_eigh(
         a,
@@ -78,3 +78,21 @@ def cusolver_mg_eigh(
     eigenvalues, eigenvectors
     """
     return mgSyevd(a, overwrite_a=overwrite_a, verbose=verbose)
+
+def cusolver_mg_eigh_workspace_requirements(N, dtype, num_devices=None, verbose=False):
+    """
+    Returns the workspace required bytes for cusolver cusolverDnXsyevdx for the 
+    specified problem size and data type. Only torch.float32 and torch.float64 are
+    supported.
+
+    Parameters:
+    N (torch::Tensor): The size of the symmetric matrix to extract eigenvalues/eigenvectors from
+    dtype: The data type of the matrix
+    num_devices: The amount of devices, if None, the number of visible devices to the system is used
+    verbose: Print some stuff
+    
+    Returns:
+    workspaceElements: The number of elements of the dtype the workspace requires
+    """
+
+    return mgSyevd_workspace_query(N, num_devices, dtype, verbose)

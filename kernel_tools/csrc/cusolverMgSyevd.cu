@@ -62,18 +62,99 @@
 #include "kernel_tools.h"
 
 template <typename T>
-void cusolverMgSyevd_template(
-    torch::Tensor a, 
-    torch::Tensor d,
-    bool verbose,
-    bool is_dry_run,
-    int64_t *workspace_elements
+void cusolverMgSyevd_workspace_template(
+    int N,
+    int num_devices,
+    bool use_num_devices_visible,
+    int64_t *workspace_elements,
+    bool verbose
 ) {
     using data_type = T;
 
     cusolverMgHandle_t cusolverH = NULL;
 
-    int d_y = a.size(0);
+    const int MAX_NUM_DEVICES = 16;
+
+    int nbGpus = 0;
+    std::vector<int> deviceList(MAX_NUM_DEVICES);
+
+    const int IA = 1;
+    const int JA = 1;
+    const int T_A = 256; /* tile size */
+    const int lda = N;
+
+    cusolverEigMode_t jobz = CUSOLVER_EIG_MODE_VECTOR;
+
+    cudaLibMgMatrixDesc_t descrA = NULL;
+    cudaLibMgGrid_t gridA = NULL;
+    cusolverMgGridMapping_t mapping = CUDALIBMG_GRID_MAPPING_COL_MAJOR;
+
+    int64_t lwork = 0; /* workspace: number of elements per device */
+
+    CUSOLVER_CHECK( cusolverMgCreate(&cusolverH) );
+
+    CUDA_CHECK( cudaGetDeviceCount(&nbGpus) );
+
+    nbGpus = (nbGpus < MAX_NUM_DEVICES) ? nbGpus : MAX_NUM_DEVICES;
+    if (use_num_devices_visible) {
+        if (verbose) std::printf("\tThere are %d GPUs \n", nbGpus);
+        for (int j = 0; j < nbGpus; j++) {
+            deviceList[j] = j;
+            cudaDeviceProp prop;
+            CUDA_CHECK( cudaGetDeviceProperties(&prop, j) );
+            if (verbose) std::printf("\tDevice %d, %s, cc %d.%d \n", j, prop.name, prop.major, prop.minor);
+        }
+    } else {
+        nbGpus = num_devices;
+    }
+
+    CUSOLVER_CHECK( cusolverMgDeviceSelect(cusolverH, nbGpus, deviceList.data()) );
+
+    // CUDA_CHECK( enablePeerAccess(nbGpus, deviceList.data()) );
+
+    CUSOLVER_CHECK( cusolverMgCreateDeviceGrid(&gridA, 1, nbGpus, deviceList.data(), mapping) );
+
+    /* (global) A is N-by-N */
+    CUSOLVER_CHECK(
+        cusolverMgCreateMatrixDesc(
+            &descrA, 
+            N, /* nubmer of rows of (global) A */
+            N,          /* number of columns of (global) A */
+            N,          /* number or rows in a tile */
+            T_A,        /* number of columns in a tile */
+            traits<data_type>::cuda_data_type, gridA
+        )
+    );
+
+    CUSOLVER_CHECK( 
+        cusolverMgSyevd_bufferSize(
+            cusolverH, 
+            jobz, 
+            CUBLAS_FILL_MODE_LOWER, /* only support lower mode */
+            N, 
+            NULL,
+            IA,         /* base-1 */
+            JA,         /* base-1 */
+            descrA, 
+            NULL,
+            traits<data_type>::cuda_data_type,
+            traits<data_type>::cuda_data_type, 
+            &lwork
+        )
+    );
+    if (verbose) std::printf("\tAllocate device workspace, lwork = %lld \n", static_cast<long long>(lwork));
+    *workspace_elements = lwork;
+}
+
+template <typename T>
+void cusolverMgSyevd_template(
+    torch::Tensor a, 
+    torch::Tensor d,
+    bool verbose
+) {
+    using data_type = T;
+
+    cusolverMgHandle_t cusolverH = NULL;
 
     /* maximum number of GPUs */
     const int MAX_NUM_DEVICES = 16;
@@ -81,7 +162,7 @@ void cusolverMgSyevd_template(
     int nbGpus = 0;
     std::vector<int> deviceList(MAX_NUM_DEVICES);
 
-    const int N = d_y;
+    const int N = a.size(0);
     const int IA = 1;
     const int JA = 1;
     const int T_A = 256; /* tile size */
@@ -98,38 +179,26 @@ void cusolverMgSyevd_template(
     int64_t lwork = 0; /* workspace: number of elements per device */
 
     if (verbose) std::printf("Step 1: Create Mg handle and select devices \n");
-    CUSOLVER_CHECK(
-        cusolverMgCreate(&cusolverH)
-    );
+    CUSOLVER_CHECK( cusolverMgCreate(&cusolverH) );
 
-    CUDA_CHECK(
-        cudaGetDeviceCount(&nbGpus)
-    );
+    CUDA_CHECK( cudaGetDeviceCount(&nbGpus) );
 
     nbGpus = (nbGpus < MAX_NUM_DEVICES) ? nbGpus : MAX_NUM_DEVICES;
     if (verbose) std::printf("\tThere are %d GPUs \n", nbGpus);
     for (int j = 0; j < nbGpus; j++) {
         deviceList[j] = j;
         cudaDeviceProp prop;
-        CUDA_CHECK(
-            cudaGetDeviceProperties(&prop, j)
-        );
+        CUDA_CHECK( cudaGetDeviceProperties(&prop, j) );
         if (verbose) std::printf("\tDevice %d, %s, cc %d.%d \n", j, prop.name, prop.major, prop.minor);
     } 
 
-    CUSOLVER_CHECK(
-        cusolverMgDeviceSelect(cusolverH, nbGpus, deviceList.data())
-    );
+    CUSOLVER_CHECK( cusolverMgDeviceSelect(cusolverH, nbGpus, deviceList.data()) );
 
     if (verbose) std::printf("step 2: Enable peer access.\n");
-    CUDA_CHECK(
-        enablePeerAccess(nbGpus, deviceList.data())
-    );
+    CUDA_CHECK( enablePeerAccess(nbGpus, deviceList.data()) );
 
     if (verbose) std::printf("Step 5: Create matrix descriptors for A and D \n");
-    CUSOLVER_CHECK(
-        cusolverMgCreateDeviceGrid(&gridA, 1, nbGpus, deviceList.data(), mapping)
-    );
+    CUSOLVER_CHECK( cusolverMgCreateDeviceGrid(&gridA, 1, nbGpus, deviceList.data(), mapping) );
 
     /* (global) A is N-by-N */
     CUSOLVER_CHECK(
@@ -143,6 +212,26 @@ void cusolverMgSyevd_template(
         )
     );
 
+    if (verbose) std::printf("Step 8: Allocate workspace space \n");
+    CUSOLVER_CHECK( 
+        cusolverMgSyevd_bufferSize(
+            cusolverH, 
+            jobz, 
+            CUBLAS_FILL_MODE_LOWER, /* only support lower mode */
+            N, 
+            NULL, //reinterpret_cast<void **>(array_d_A.data()), 
+            IA,         /* base-1 */
+            JA,         /* base-1 */
+            descrA, 
+            NULL, // reinterpret_cast<void *>(d_data), 
+            traits<data_type>::cuda_data_type,
+            traits<data_type>::cuda_data_type, 
+            &lwork
+        )
+    );
+
+    if (verbose) std::printf("\tAllocate device workspace, lwork = %lld \n", static_cast<long long>(lwork));
+
     if (verbose) std::printf("Step 6: Allocate distributed matrices A and D \n");
     std::vector<data_type *> array_d_A(nbGpus, nullptr);
     data_type *a_data = a.data_ptr<data_type>();
@@ -155,29 +244,6 @@ void cusolverMgSyevd_template(
 
     // Hacky way to make sure on a bad status we still deallocate all the memory
     do {
-
-        if (verbose) std::printf("Step 8: Allocate workspace space \n");
-        cuda_solver_status = 
-            cusolverMgSyevd_bufferSize(
-                cusolverH, 
-                jobz, 
-                CUBLAS_FILL_MODE_LOWER, /* only support lower mode */
-                N, 
-                NULL, //reinterpret_cast<void **>(array_d_A.data()), 
-                IA,         /* base-1 */
-                JA,         /* base-1 */
-                descrA, 
-                NULL, // reinterpret_cast<void *>(d_data), 
-                traits<data_type>::cuda_data_type,
-                traits<data_type>::cuda_data_type, 
-                &lwork
-            );
-        if (cuda_solver_status != CUSOLVER_STATUS_SUCCESS) break;
-
-        if (verbose) std::printf("\tAllocate device workspace, lwork = %lld \n", static_cast<long long>(lwork));
-        *workspace_elements = lwork;
-
-        if (is_dry_run) break;
         /* A := 0 */
         cuda_status = 
             createMat<data_type>(
@@ -282,21 +348,15 @@ void cusolverMgSyevd_template(
     CUDA_CHECK(workspaceFree_status);
 
     if (descrA != NULL) {
-        CUSOLVER_CHECK(
-            cusolverMgDestroyMatrixDesc(descrA)
-        );
+        CUSOLVER_CHECK( cusolverMgDestroyMatrixDesc(descrA) );
     }
 
     if (gridA != NULL) {
-        CUSOLVER_CHECK(
-            cusolverMgDestroyGrid(gridA)
-        );
+        CUSOLVER_CHECK( cusolverMgDestroyGrid(gridA) );
     }
 
     if (cusolverH != NULL) {
-        CUSOLVER_CHECK(
-            cusolverMgDestroy(cusolverH)
-        );
+        CUSOLVER_CHECK( cusolverMgDestroy(cusolverH) );
     }
 
     if (0 > info) {
@@ -312,27 +372,51 @@ void cusolverMgSyevd_template(
 void cusolverMgSyevd_export(
     torch::Tensor a, 
     torch::Tensor d,
-    bool verbose,
-    bool dry_run
+    bool verbose
 ) {
-    if (a.dtype() != d.dtype()) {
+    if (a.dtype() != d.dtype())
         throw std::runtime_error("Both tensors must have same dtype");
-    }
 
-    if (a.is_cuda() || d.is_cuda()) {
+    if (a.is_cuda() || d.is_cuda())
         throw std::runtime_error("Tensors must be on the Host, not device.");
-    }
 
-    if (a.dim() != 2) throw std::runtime_error("Dimension of tensor needs to be 2");
+    if (a.dim() != 2) 
+        throw std::runtime_error("Dimension of tensor needs to be 2");
 
-    if (a.size(0) != a.size(1)) throw std::runtime_error("Matrix needs to be square");
+    if (a.size(0) != a.size(1)) 
+        throw std::runtime_error("Matrix needs to be square");
 
-    int64_t workspace_elements;
-    if (a.dtype() == torch::kFloat32) return cusolverMgSyevd_template<float>(a, d, verbose, dry_run, &workspace_elements);
-    if (a.dtype() == torch::kFloat64) return cusolverMgSyevd_template<double>(a, d, verbose, dry_run, &workspace_elements);
+    if (a.dtype() == torch::kFloat32) 
+        return cusolverMgSyevd_template<float>(a, d, verbose);
 
-    printf("workspace: %z\n", workspace_elements);
+    if (a.dtype() == torch::kFloat64) 
+        return cusolverMgSyevd_template<double>(a, d, verbose);
 
     // If it gets here the dtype isn't supported
     throw std::runtime_error("Tensor needs to have dtype either float32 or float64");
+}
+
+void cusolverMgSyevd_workspace_query_export(
+    int N,
+    int num_devices,
+    bool is_fp32,
+    bool use_num_devices_visible,
+    torch::Tensor workspace_num_elements,
+    bool verbose
+) {
+    if (workspace_num_elements.dtype() != torch::kInt64) {
+        throw std::runtime_error("workspace_num_elements tensor needs to have dtype int64");
+    }
+
+    if (workspace_num_elements.numel() != 1) {
+        throw std::runtime_error("workspace_num_elements tensor needs to have only one element");
+    }
+
+    int64_t num_workspace_elements;
+    if (is_fp32) {
+        cusolverMgSyevd_workspace_template<float>(N, num_devices, use_num_devices_visible, &num_workspace_elements, verbose);
+    } else {
+        cusolverMgSyevd_workspace_template<double>(N, num_devices, use_num_devices_visible, &num_workspace_elements, verbose);
+    }
+    *workspace_num_elements.data_ptr<int64_t>() = num_workspace_elements;
 }

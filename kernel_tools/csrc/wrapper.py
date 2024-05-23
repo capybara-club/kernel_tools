@@ -180,6 +180,31 @@ def mgSyevd(a, overwrite_a = False, verbose = False):
         out = a.clone()
     else:
         out = a
-    dry_run = True
-    SingletonClass().kernel.cusolverMgSyevd_export(out, d, verbose, dry_run)
+    SingletonClass().kernel.cusolverMgSyevd_export(out, d, verbose)
     return d, out.T
+
+def mgSyevd_workspace_query(
+        N,
+        num_devices,
+        dtype,
+        verbose
+):
+    if dtype != torch.float32 and dtype != torch.float64:
+        raise ValueError("Unsupported dtype")
+    
+    use_num_devices_visible = False
+    if num_devices is None:
+        num_devices = 0
+        use_num_devices_visible = True
+        
+    is_fp32 = dtype == torch.float32
+    workspaceNumElementsTensor = torch.tensor(0, dtype=torch.int64)
+    SingletonClass().kernel.cusolverMgSyevd_workspace_query_export(
+        N,
+        num_devices,
+        is_fp32,
+        use_num_devices_visible,
+        workspaceNumElementsTensor,
+        verbose
+    )
+    return workspaceNumElementsTensor.item()
