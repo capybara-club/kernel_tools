@@ -180,5 +180,6 @@ def mgSyevd(a, overwrite_a = False, verbose = False):
         out = a.clone()
     else:
         out = a
-    SingletonClass().kernel.cusolverMgSyevd_export(out, d, verbose)
+    dry_run = True
+    SingletonClass().kernel.cusolverMgSyevd_export(out, d, verbose, dry_run)
     return d, out.T

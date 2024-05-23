@@ -25,5 +25,13 @@ void cusolverDnXsyevdx_workspace_query_export(
 void cusolverMgSyevd_export(
     torch::Tensor a, 
     torch::Tensor d,
+    bool verbose,
+    bool dry_run
+);
+
+void cusolverMgSyevd_workspace_query_export(
+    int N,
+    int num_devices,
+    bool is_fp32,
     bool verbose
 );

@@ -65,7 +65,9 @@ template <typename T>
 void cusolverMgSyevd_template(
     torch::Tensor a, 
     torch::Tensor d,
-    bool verbose
+    bool verbose,
+    bool is_dry_run,
+    int64_t *workspace_elements
 ) {
     using data_type = T;
 
@@ -153,47 +155,63 @@ void cusolverMgSyevd_template(
 
     // Hacky way to make sure on a bad status we still deallocate all the memory
     do {
-        /* A := 0 */
-        cuda_status = createMat<data_type>(
-            nbGpus, 
-            deviceList.data(), 
-            N, /* number of columns of global A */
-            T_A,                          /* number of columns per column tile */
-            lda,                          /* leading dimension of local A */
-            array_d_A.data()
-        );
-        if (cuda_status != cudaSuccess) break;
-
-        if (verbose) std::printf("Step 7: Prepare data on devices \n");
-        cuda_status = memcpyH2D<data_type>(nbGpus, deviceList.data(), N, N,
-            /* input */
-            a_data, lda,
-            /* output */
-            N,                /* number of columns of global A */
-            T_A,              /* number of columns per column tile */
-            lda,              /* leading dimension of local A */
-            array_d_A.data(), /* host pointer array of dimension nbGpus */
-            IA, JA
-        );
-        if (cuda_status != cudaSuccess) break;
 
         if (verbose) std::printf("Step 8: Allocate workspace space \n");
-        cuda_solver_status = cusolverMgSyevd_bufferSize(
-            cusolverH, (cusolverEigMode_t)jobz, CUBLAS_FILL_MODE_LOWER, /* only support lower mode */
-            N, reinterpret_cast<void **>(array_d_A.data()), IA,         /* base-1 */
-            JA,                                                         /* base-1 */
-            descrA, reinterpret_cast<void *>(d_data), traits<data_type>::cuda_data_type,
-            traits<data_type>::cuda_data_type, &lwork
-        );
+        cuda_solver_status = 
+            cusolverMgSyevd_bufferSize(
+                cusolverH, 
+                jobz, 
+                CUBLAS_FILL_MODE_LOWER, /* only support lower mode */
+                N, 
+                NULL, //reinterpret_cast<void **>(array_d_A.data()), 
+                IA,         /* base-1 */
+                JA,         /* base-1 */
+                descrA, 
+                NULL, // reinterpret_cast<void *>(d_data), 
+                traits<data_type>::cuda_data_type,
+                traits<data_type>::cuda_data_type, 
+                &lwork
+            );
         if (cuda_solver_status != CUSOLVER_STATUS_SUCCESS) break;
 
         if (verbose) std::printf("\tAllocate device workspace, lwork = %lld \n", static_cast<long long>(lwork));
+        *workspace_elements = lwork;
+
+        if (is_dry_run) break;
+        /* A := 0 */
+        cuda_status = 
+            createMat<data_type>(
+                nbGpus, 
+                deviceList.data(), 
+                N, /* number of columns of global A */
+                T_A,                          /* number of columns per column tile */
+                lda,                          /* leading dimension of local A */
+                array_d_A.data()
+            );
+        if (cuda_status != cudaSuccess) break;
+
+        if (verbose) std::printf("Step 7: Prepare data on devices \n");
+        cuda_status = 
+            memcpyH2D<data_type>(nbGpus, deviceList.data(), N, N,
+                /* input */
+                a_data, lda,
+                /* output */
+                N,                /* number of columns of global A */
+                T_A,              /* number of columns per column tile */
+                lda,              /* leading dimension of local A */
+                array_d_A.data(), /* host pointer array of dimension nbGpus */
+                IA, JA
+            );
+        if (cuda_status != cudaSuccess) break;
 
         /* array_d_work[j] points to device workspace of device j */
-        cuda_status = workspaceAlloc(nbGpus, deviceList.data(),
-                        sizeof(data_type) * lwork, /* number of bytes per device */
-                        reinterpret_cast<void **>(array_d_work.data())
-        );
+        cuda_status = 
+            workspaceAlloc(
+                nbGpus, 
+                deviceList.data(),
+                sizeof(data_type) * lwork, /* number of bytes per device */
+                reinterpret_cast<void **>(array_d_work.data())
+            );
         if (cuda_status != cudaSuccess) break;
 
         /* sync all devices */
@@ -201,13 +219,23 @@ void cusolverMgSyevd_template(
         if (cuda_status != cudaSuccess) break;
 
         if (verbose) std::printf("Step 9: Compute eigenvalues and eigenvectors \n");
-        cuda_solver_status = cusolverMgSyevd(
-            cusolverH, (cusolverEigMode_t)jobz, CUBLAS_FILL_MODE_LOWER, /* only support lower mode */
-            N, reinterpret_cast<void **>(array_d_A.data()),             /* exit: eigenvectors */
-            IA, JA, descrA, reinterpret_cast<void **>(d_data),        /* exit: eigenvalues */
-            traits<data_type>::cuda_data_type, traits<data_type>::cuda_data_type,
-            reinterpret_cast<void **>(array_d_work.data()), lwork, &info /* host */
-        );
+        cuda_solver_status = 
+            cusolverMgSyevd(
+                cusolverH, 
+                jobz, 
+                CUBLAS_FILL_MODE_LOWER, /* only support lower mode */
+                N, 
+                reinterpret_cast<void **>(array_d_A.data()),             /* exit: eigenvectors */
+                IA, 
+                JA, 
+                descrA, 
+                reinterpret_cast<void **>(d_data),        /* exit: eigenvalues */
+                traits<data_type>::cuda_data_type, 
+                traits<data_type>::cuda_data_type,
+                reinterpret_cast<void **>(array_d_work.data()), 
+                lwork, 
+                &info /* host */
+            );
         if (cuda_solver_status != CUSOLVER_STATUS_SUCCESS) break;
 
         /* sync all devices */
@@ -221,16 +249,17 @@ void cusolverMgSyevd_template(
         }
 
         if (verbose) std::printf("Step 10: Copy eigenvectors to A and eigenvalues to D\n");
-        cuda_status = memcpyD2H<data_type>(nbGpus, deviceList.data(), N, N,
-            /* input */
-            N,   /* number of columns of global A */
-            T_A, /* number of columns per column tile */
-            lda, /* leading dimension of local A */
-            array_d_A.data(), IA, JA,
-            /* output */
-            a_data, /* N-y-N eigenvectors */
-            lda
-        );
+        cuda_status = 
+            memcpyD2H<data_type>(nbGpus, deviceList.data(), N, N,
+                /* input */
+                N,   /* number of columns of global A */
+                T_A, /* number of columns per column tile */
+                lda, /* leading dimension of local A */
+                array_d_A.data(), IA, JA,
+                /* output */
+                a_data, /* N-y-N eigenvectors */
+                lda
+            );
         if (cuda_status != cudaSuccess) break;
     } while(0);
 
@@ -238,9 +267,14 @@ void cusolverMgSyevd_template(
     cudaError_t workspaceFree_status;
 
     if (verbose) std::printf("step 12: Free resources \n");
-    destroyMat_status = destroyMat(nbGpus, deviceList.data(), N, /* number of columns of global A */
-               T_A,                          /* number of columns per column tile */
-               reinterpret_cast<void **>(array_d_A.data()));
+    destroyMat_status = 
+        destroyMat(
+            nbGpus, 
+            deviceList.data(), 
+            N,   /* number of columns of global A */
+            T_A, /* number of columns per column tile */
+            reinterpret_cast<void **>(array_d_A.data())
+        );
 
     workspaceFree_status = workspaceFree(nbGpus, deviceList.data(), reinterpret_cast<void **>(array_d_work.data()));
 
@@ -278,7 +312,8 @@ void cusolverMgSyevd_template(
 void cusolverMgSyevd_export(
     torch::Tensor a, 
     torch::Tensor d,
-    bool verbose
+    bool verbose,
+    bool dry_run
 ) {
     if (a.dtype() != d.dtype()) {
         throw std::runtime_error("Both tensors must have same dtype");
@@ -292,8 +327,11 @@ void cusolverMgSyevd_export(
 
     if (a.size(0) != a.size(1)) throw std::runtime_error("Matrix needs to be square");
 
-    if (a.dtype() == torch::kFloat32) return cusolverMgSyevd_template<float>(a, d, verbose);
-    if (a.dtype() == torch::kFloat64) return cusolverMgSyevd_template<double>(a, d, verbose);
+    int64_t workspace_elements;
+    if (a.dtype() == torch::kFloat32) return cusolverMgSyevd_template<float>(a, d, verbose, dry_run, &workspace_elements);
+    if (a.dtype() == torch::kFloat64) return cusolverMgSyevd_template<double>(a, d, verbose, dry_run, &workspace_elements);
+
+    printf("workspace: %z\n", workspace_elements);
 
     // If it gets here the dtype isn't supported
     throw std::runtime_error("Tensor needs to have dtype either float32 or float64");
