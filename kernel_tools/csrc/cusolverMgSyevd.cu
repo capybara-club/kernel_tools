@@ -90,117 +90,162 @@ void cusolverMgSyevd_template(torch::Tensor a, torch::Tensor d) {
     cusolverMgGridMapping_t mapping = CUDALIBMG_GRID_MAPPING_COL_MAJOR;
 
     int64_t lwork = 0; /* workspace: number of elements per device */
+
+    std::printf("Step 1: Create Mg handle and select devices \n");
+    CUSOLVER_CHECK(
+        cusolverMgCreate(&cusolverH)
+    );
+
+    CUDA_CHECK(
+        cudaGetDeviceCount(&nbGpus)
+    );
+
+    nbGpus = (nbGpus < MAX_NUM_DEVICES) ? nbGpus : MAX_NUM_DEVICES;
+    std::printf("\tThere are %d GPUs \n", nbGpus);
+    for (int j = 0; j < nbGpus; j++) {
+        deviceList[j] = j;
+        cudaDeviceProp prop;
+        CUDA_CHECK(
+            cudaGetDeviceProperties(&prop, j)
+        );
+        std::printf("\tDevice %d, %s, cc %d.%d \n", j, prop.name, prop.major, prop.minor);
+    } 
+
+    CUSOLVER_CHECK(
+        cusolverMgDeviceSelect(cusolverH, nbGpus, deviceList.data())
+    );
+
+    std::printf("step 2: Enable peer access.\n");
+    CUDA_CHECK(
+        enablePeerAccess(nbGpus, deviceList.data())
+    );
+
+    std::printf("Step 5: Create matrix descriptors for A and D \n");
+    CUSOLVER_CHECK(
+        cusolverMgCreateDeviceGrid(&gridA, 1, nbGpus, deviceList.data(), mapping)
+    );
+
+    /* (global) A is N-by-N */
+    CUSOLVER_CHECK(
+        cusolverMgCreateMatrixDesc(
+            &descrA, 
+            N, /* nubmer of rows of (global) A */
+            N,          /* number of columns of (global) A */
+            N,          /* number or rows in a tile */
+            T_A,        /* number of columns in a tile */
+            traits<data_type>::cuda_data_type, gridA
+        )
+    );
+
+    std::printf("Step 6: Allocate distributed matrices A and D \n");
     std::vector<data_type *> array_d_A(nbGpus, nullptr);
+    data_type *a_data = a.data_ptr<data_type>();
+    data_type *d_data = d.data_ptr<data_type>();
+
     std::vector<data_type *> array_d_work(nbGpus, nullptr);
 
+    cudaError_t cuda_status = cudaSuccess;
+    cusolverStatus_t cuda_solver_status = CUSOLVER_STATUS_SUCCESS;
+
+    // Hacky way to make sure on a bad status we still deallocate all the memory
     do {
-        std::printf("Step 1: Create Mg handle and select devices \n");
-        CUSOLVER_CHECK_BREAK(cusolverMgCreate(&cusolverH));
-
-        CUDA_CHECK_BREAK(cudaGetDeviceCount(&nbGpus));
-
-        nbGpus = (nbGpus < MAX_NUM_DEVICES) ? nbGpus : MAX_NUM_DEVICES;
-        std::printf("\tThere are %d GPUs \n", nbGpus);
-        for (int j = 0; j < nbGpus; j++) {
-            deviceList[j] = j;
-            cudaDeviceProp prop;
-            CUDA_CHECK_BREAK(cudaGetDeviceProperties(&prop, j));
-            std::printf("\tDevice %d, %s, cc %d.%d \n", j, prop.name, prop.major, prop.minor);
-        }
-
-        CUSOLVER_CHECK_BREAK(cusolverMgDeviceSelect(cusolverH, nbGpus, deviceList.data()));
-
-        std::printf("step 2: Enable peer access.\n");
-        CUDA_CHECK_BREAK(
-            enablePeerAccess(nbGpus, deviceList.data())
+        /* A := 0 */
+        cuda_status = createMat<data_type>(
+            nbGpus, 
+            deviceList.data(), 
+            N, /* number of columns of global A */
+            T_A,                          /* number of columns per column tile */
+            lda,                          /* leading dimension of local A */
+            array_d_A.data()
         );
-
-        std::printf("Step 5: Create matrix descriptors for A and D \n");
-        CUSOLVER_CHECK_BREAK(cusolverMgCreateDeviceGrid(&gridA, 1, nbGpus, deviceList.data(), mapping));
-
-        /* (global) A is N-by-N */
-        CUSOLVER_CHECK_BREAK(cusolverMgCreateMatrixDesc(&descrA, N, /* nubmer of rows of (global) A */
-                                                N,          /* number of columns of (global) A */
-                                                N,          /* number or rows in a tile */
-                                                T_A,        /* number of columns in a tile */
-                                                traits<data_type>::cuda_data_type, gridA));
-
-        std::printf("Step 6: Allocate distributed matrices A and D \n");
-        data_type *a_data = a.data_ptr<data_type>();
-        data_type *d_data = d.data_ptr<data_type>();
-        CUDA_CHECK_BREAK(
-            /* A := 0 */
-            createMat<data_type>(nbGpus, deviceList.data(), N, /* number of columns of global A */
-                                T_A,                          /* number of columns per column tile */
-                                lda,                          /* leading dimension of local A */
-                                array_d_A.data())
-        );
+        if (cuda_status != cudaSuccess) break;
 
         std::printf("Step 7: Prepare data on devices \n");
-        memcpyH2D<data_type>(nbGpus, deviceList.data(), N, N,
-                            /* input */
-                            a_data, lda,
-                            /* output */
-                            N,                /* number of columns of global A */
-                            T_A,              /* number of columns per column tile */
-                            lda,              /* leading dimension of local A */
-                            array_d_A.data(), /* host pointer array of dimension nbGpus */
-                            IA, JA);
+        cuda_status = memcpyH2D<data_type>(nbGpus, deviceList.data(), N, N,
+            /* input */
+            a_data, lda,
+            /* output */
+            N,                /* number of columns of global A */
+            T_A,              /* number of columns per column tile */
+            lda,              /* leading dimension of local A */
+            array_d_A.data(), /* host pointer array of dimension nbGpus */
+            IA, JA
+        );
+        if (cuda_status != cudaSuccess) break;
 
         std::printf("Step 8: Allocate workspace space \n");
-        CUSOLVER_CHECK_BREAK(cusolverMgSyevd_bufferSize(
+        cuda_solver_status = cusolverMgSyevd_bufferSize(
             cusolverH, (cusolverEigMode_t)jobz, CUBLAS_FILL_MODE_LOWER, /* only support lower mode */
             N, reinterpret_cast<void **>(array_d_A.data()), IA,         /* base-1 */
             JA,                                                         /* base-1 */
             descrA, reinterpret_cast<void *>(d_data), traits<data_type>::cuda_data_type,
-            traits<data_type>::cuda_data_type, &lwork));
+            traits<data_type>::cuda_data_type, &lwork
+        );
+        if (cuda_solver_status != CUSOLVER_STATUS_SUCCESS) break;
 
         std::printf("\tAllocate device workspace, lwork = %lld \n", static_cast<long long>(lwork));
 
         /* array_d_work[j] points to device workspace of device j */
-        workspaceAlloc(nbGpus, deviceList.data(),
-                    sizeof(data_type) * lwork, /* number of bytes per device */
-                    reinterpret_cast<void **>(array_d_work.data()));
+        cuda_status = workspaceAlloc(nbGpus, deviceList.data(),
+                        sizeof(data_type) * lwork, /* number of bytes per device */
+                        reinterpret_cast<void **>(array_d_work.data())
+        );
+        if (cuda_status != cudaSuccess) break;
 
         /* sync all devices */
-        CUDA_CHECK_BREAK(cudaDeviceSynchronize());
+        cuda_status = cudaDeviceSynchronize();
+        if (cuda_status != cudaSuccess) break;
 
         std::printf("Step 9: Compute eigenvalues and eigenvectors \n");
-        CUSOLVER_CHECK_BREAK(cusolverMgSyevd(
+        cuda_solver_status = cusolverMgSyevd(
             cusolverH, (cusolverEigMode_t)jobz, CUBLAS_FILL_MODE_LOWER, /* only support lower mode */
             N, reinterpret_cast<void **>(array_d_A.data()),             /* exit: eigenvectors */
             IA, JA, descrA, reinterpret_cast<void **>(d_data),        /* exit: eigenvalues */
             traits<data_type>::cuda_data_type, traits<data_type>::cuda_data_type,
             reinterpret_cast<void **>(array_d_work.data()), lwork, &info /* host */
-            ));
+        );
+        if (cuda_solver_status != CUSOLVER_STATUS_SUCCESS) break;
 
         /* sync all devices */
-        CUDA_CHECK_BREAK(cudaDeviceSynchronize());
+        cuda_status = cudaDeviceSynchronize();
+        if (cuda_status != cudaSuccess) break;
 
         /* check if SYEVD converges */
         if (0 > info) {
             std::printf("%d-th parameter is wrong \n", -info);
-            throw std::runtime_error("cusolverMgSyevd info is wrong, see documentation");
+            cuda_solver_status = CUSOLVER_STATUS_INVALID_VALUE;
+            break;
+            // throw std::runtime_error("cusolverMgSyevd info is wrong, see documentation");
         }
 
         std::printf("Step 10: Copy eigenvectors to A and eigenvalues to D\n");
-        memcpyD2H<data_type>(nbGpus, deviceList.data(), N, N,
-                            /* input */
-                            N,   /* number of columns of global A */
-                            T_A, /* number of columns per column tile */
-                            lda, /* leading dimension of local A */
-                            array_d_A.data(), IA, JA,
-                            /* output */
-                            a_data, /* N-y-N eigenvectors */
-                            lda);
+        cuda_status = memcpyD2H<data_type>(nbGpus, deviceList.data(), N, N,
+            /* input */
+            N,   /* number of columns of global A */
+            T_A, /* number of columns per column tile */
+            lda, /* leading dimension of local A */
+            array_d_A.data(), IA, JA,
+            /* output */
+            a_data, /* N-y-N eigenvectors */
+            lda
+        );
+        if (cuda_status != cudaSuccess) break;
     } while(0);
 
+    cudaError_t destroyMat_status;
+    cudaError_t workspaceFree_status;
+
     std::printf("step 12: Free resources \n");
-    destroyMat(nbGpus, deviceList.data(), N, /* number of columns of global A */
+    destroyMat_status = destroyMat(nbGpus, deviceList.data(), N, /* number of columns of global A */
                T_A,                          /* number of columns per column tile */
                reinterpret_cast<void **>(array_d_A.data()));
 
-    workspaceFree(nbGpus, deviceList.data(), reinterpret_cast<void **>(array_d_work.data()));
+    workspaceFree_status = workspaceFree(nbGpus, deviceList.data(), reinterpret_cast<void **>(array_d_work.data()));
+
+    CUDA_CHECK(destroyMat_status);
+    CUDA_CHECK(workspaceFree_status);
+    CUDA_CHECK(cuda_status);
+    CUSOLVER_CHECK(cuda_solver_status);
 }
 
 void cusolverMgSyevd_export(torch::Tensor a, torch::Tensor d) {
