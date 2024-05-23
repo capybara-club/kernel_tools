@@ -9,15 +9,17 @@ from kernel_tools.linalg import cusolver_eigh, cusolver_mg_eigh, cusolver_eigh_w
 # torch.set_printoptions(linewidth=240)
 
 kernel_fn = lambda x, z: kernels.laplacian(x, z, bandwidth=20.)
+dtype = torch.float64
 
 N = 100_000
 
-device_bytes, host_bytes = cusolver_eigh_workspace_requirements(N, torch.float64)
+device_bytes, host_bytes = cusolver_eigh_workspace_requirements(N, dtype)
 print(f'device_bytes: {device_bytes}')
 print(f'host_bytes: {host_bytes}')
 
-device_elements = cusolver_mg_eigh_workspace_requirements(N, torch.float64, verbose=True, num_devices=None)
+device_elements = cusolver_mg_eigh_workspace_requirements(N, dtype, verbose=True, num_devices=4)
 print(f'device_elements: {device_elements}')
+print(f'device_bytes_requirement: {device_elements * dtype.itemsize}')
 # exit()
 exit()
 
