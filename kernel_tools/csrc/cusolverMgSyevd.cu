@@ -62,7 +62,11 @@
 #include "kernel_tools.h"
 
 template <typename T>
-void cusolverMgSyevd_template(torch::Tensor a, torch::Tensor d) {
+void cusolverMgSyevd_template(
+    torch::Tensor a, 
+    torch::Tensor d,
+    bool verbose
+) {
     using data_type = T;
 
     cusolverMgHandle_t cusolverH = NULL;
@@ -91,7 +95,7 @@ void cusolverMgSyevd_template(torch::Tensor a, torch::Tensor d) {
 
     int64_t lwork = 0; /* workspace: number of elements per device */
 
-    std::printf("Step 1: Create Mg handle and select devices \n");
+    if (verbose) std::printf("Step 1: Create Mg handle and select devices \n");
     CUSOLVER_CHECK(
         cusolverMgCreate(&cusolverH)
     );
@@ -101,26 +105,26 @@ void cusolverMgSyevd_template(torch::Tensor a, torch::Tensor d) {
     );
 
     nbGpus = (nbGpus < MAX_NUM_DEVICES) ? nbGpus : MAX_NUM_DEVICES;
-    std::printf("\tThere are %d GPUs \n", nbGpus);
+    if (verbose) std::printf("\tThere are %d GPUs \n", nbGpus);
     for (int j = 0; j < nbGpus; j++) {
         deviceList[j] = j;
         cudaDeviceProp prop;
         CUDA_CHECK(
             cudaGetDeviceProperties(&prop, j)
         );
-        std::printf("\tDevice %d, %s, cc %d.%d \n", j, prop.name, prop.major, prop.minor);
+        if (verbose) std::printf("\tDevice %d, %s, cc %d.%d \n", j, prop.name, prop.major, prop.minor);
     } 
 
     CUSOLVER_CHECK(
         cusolverMgDeviceSelect(cusolverH, nbGpus, deviceList.data())
     );
 
-    std::printf("step 2: Enable peer access.\n");
+    if (verbose) std::printf("step 2: Enable peer access.\n");
     CUDA_CHECK(
         enablePeerAccess(nbGpus, deviceList.data())
     );
 
-    std::printf("Step 5: Create matrix descriptors for A and D \n");
+    if (verbose) std::printf("Step 5: Create matrix descriptors for A and D \n");
     CUSOLVER_CHECK(
         cusolverMgCreateDeviceGrid(&gridA, 1, nbGpus, deviceList.data(), mapping)
     );
@@ -137,7 +141,7 @@ void cusolverMgSyevd_template(torch::Tensor a, torch::Tensor d) {
         )
     );
 
-    std::printf("Step 6: Allocate distributed matrices A and D \n");
+    if (verbose) std::printf("Step 6: Allocate distributed matrices A and D \n");
     std::vector<data_type *> array_d_A(nbGpus, nullptr);
     data_type *a_data = a.data_ptr<data_type>();
     data_type *d_data = d.data_ptr<data_type>();
@@ -160,7 +164,7 @@ void cusolverMgSyevd_template(torch::Tensor a, torch::Tensor d) {
         );
         if (cuda_status != cudaSuccess) break;
 
-        std::printf("Step 7: Prepare data on devices \n");
+        if (verbose) std::printf("Step 7: Prepare data on devices \n");
         cuda_status = memcpyH2D<data_type>(nbGpus, deviceList.data(), N, N,
             /* input */
             a_data, lda,
@@ -173,7 +177,7 @@ void cusolverMgSyevd_template(torch::Tensor a, torch::Tensor d) {
         );
         if (cuda_status != cudaSuccess) break;
 
-        std::printf("Step 8: Allocate workspace space \n");
+        if (verbose) std::printf("Step 8: Allocate workspace space \n");
         cuda_solver_status = cusolverMgSyevd_bufferSize(
             cusolverH, (cusolverEigMode_t)jobz, CUBLAS_FILL_MODE_LOWER, /* only support lower mode */
             N, reinterpret_cast<void **>(array_d_A.data()), IA,         /* base-1 */
@@ -183,7 +187,7 @@ void cusolverMgSyevd_template(torch::Tensor a, torch::Tensor d) {
         );
         if (cuda_solver_status != CUSOLVER_STATUS_SUCCESS) break;
 
-        std::printf("\tAllocate device workspace, lwork = %lld \n", static_cast<long long>(lwork));
+        if (verbose) std::printf("\tAllocate device workspace, lwork = %lld \n", static_cast<long long>(lwork));
 
         /* array_d_work[j] points to device workspace of device j */
         cuda_status = workspaceAlloc(nbGpus, deviceList.data(),
@@ -196,7 +200,7 @@ void cusolverMgSyevd_template(torch::Tensor a, torch::Tensor d) {
         cuda_status = cudaDeviceSynchronize();
         if (cuda_status != cudaSuccess) break;
 
-        std::printf("Step 9: Compute eigenvalues and eigenvectors \n");
+        if (verbose) std::printf("Step 9: Compute eigenvalues and eigenvectors \n");
         cuda_solver_status = cusolverMgSyevd(
             cusolverH, (cusolverEigMode_t)jobz, CUBLAS_FILL_MODE_LOWER, /* only support lower mode */
             N, reinterpret_cast<void **>(array_d_A.data()),             /* exit: eigenvectors */
@@ -212,13 +216,12 @@ void cusolverMgSyevd_template(torch::Tensor a, torch::Tensor d) {
 
         /* check if SYEVD converges */
         if (0 > info) {
-            std::printf("%d-th parameter is wrong \n", -info);
-            cuda_solver_status = CUSOLVER_STATUS_INVALID_VALUE;
+            // Break here and check info after everything is freed
             break;
             // throw std::runtime_error("cusolverMgSyevd info is wrong, see documentation");
         }
 
-        std::printf("Step 10: Copy eigenvectors to A and eigenvalues to D\n");
+        if (verbose) std::printf("Step 10: Copy eigenvectors to A and eigenvalues to D\n");
         cuda_status = memcpyD2H<data_type>(nbGpus, deviceList.data(), N, N,
             /* input */
             N,   /* number of columns of global A */
@@ -235,7 +238,7 @@ void cusolverMgSyevd_template(torch::Tensor a, torch::Tensor d) {
     cudaError_t destroyMat_status;
     cudaError_t workspaceFree_status;
 
-    std::printf("step 12: Free resources \n");
+    if (verbose) std::printf("step 12: Free resources \n");
     destroyMat_status = destroyMat(nbGpus, deviceList.data(), N, /* number of columns of global A */
                T_A,                          /* number of columns per column tile */
                reinterpret_cast<void **>(array_d_A.data()));
@@ -244,11 +247,22 @@ void cusolverMgSyevd_template(torch::Tensor a, torch::Tensor d) {
 
     CUDA_CHECK(destroyMat_status);
     CUDA_CHECK(workspaceFree_status);
+
+    if (0 > info) {
+        char buffer[100];
+        std::snprintf(buffer, sizeof(buffer), "%d-th parameter is wrong \n", -info);
+        throw std::runtime_error(buffer);
+    }
+
     CUDA_CHECK(cuda_status);
     CUSOLVER_CHECK(cuda_solver_status);
 }
 
-void cusolverMgSyevd_export(torch::Tensor a, torch::Tensor d) {
+void cusolverMgSyevd_export(
+    torch::Tensor a, 
+    torch::Tensor d,
+    bool verbose
+) {
     if (a.dtype() != d.dtype()) {
         throw std::runtime_error("Both tensors must have same dtype");
     }
@@ -261,8 +275,8 @@ void cusolverMgSyevd_export(torch::Tensor a, torch::Tensor d) {
 
     if (a.size(0) != a.size(1)) throw std::runtime_error("Matrix needs to be square");
 
-    if (a.dtype() == torch::kFloat32) return cusolverMgSyevd_template<float>(a, d);
-    if (a.dtype() == torch::kFloat64) return cusolverMgSyevd_template<double>(a, d);
+    if (a.dtype() == torch::kFloat32) return cusolverMgSyevd_template<float>(a, d, verbose);
+    if (a.dtype() == torch::kFloat64) return cusolverMgSyevd_template<double>(a, d, verbose);
 
     // If it gets here the dtype isn't supported
     throw std::runtime_error("Tensor needs to have dtype either float32 or float64");

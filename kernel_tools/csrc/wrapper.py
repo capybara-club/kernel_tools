@@ -173,12 +173,12 @@ def syevdx_workspace_query(
     )
     return workspaceBytesDeviceTensor.item(), workspaceBytesHostTensor.item()
 
-def mgSyevd(a, overwrite_a = False):
+def mgSyevd(a, overwrite_a = False, verbose = False):
     N = a.size(0)
     d = torch.zeros(N, dtype=a.dtype, device=a.device)
     if not overwrite_a:
         out = a.clone()
     else:
         out = a
-    SingletonClass().kernel.cusolverMgSyevd_export(out, d)
+    SingletonClass().kernel.cusolverMgSyevd_export(out, d, verbose)
     return d, out.T

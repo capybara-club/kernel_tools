@@ -29,7 +29,7 @@ def cusolver_eigh(
     eigvals_only: Only return the eigenvalues of a. If overwrite_a is True, then
         'a' will not be copied and this routine will still destroy 'a'.
     verbose: Currently only prints the requested workspace size. This is useful if you are crashing.
-    
+
     Returns:
     eigenvalues, eigenvectors of the range specified if eigvals_only is false
     eigenvalues of the range specified if eigvals_only is true
@@ -60,7 +60,8 @@ def cusolver_eigh_workspace_requirements(N, dtype):
 
 def cusolver_mg_eigh(
     a,
-    overwrite_a = False
+    overwrite_a = False,
+    verbose = False
 ):
     """
     Uses cusolver cusolverMgsyevd to get all of the eigenvalues and eigenvectors of
@@ -76,4 +77,4 @@ def cusolver_mg_eigh(
     Returns:
     eigenvalues, eigenvectors
     """
-    return mgSyevd(a, overwrite_a=overwrite_a)
+    return mgSyevd(a, overwrite_a=overwrite_a, verbose=verbose)

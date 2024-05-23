@@ -24,5 +24,6 @@ void cusolverDnXsyevdx_workspace_query_export(
 
 void cusolverMgSyevd_export(
     torch::Tensor a, 
-    torch::Tensor d
+    torch::Tensor d,
+    bool verbose
 );
