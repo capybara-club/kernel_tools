@@ -4,30 +4,26 @@ import time
 from scipy.linalg import eigh as scipy_eigh
 
 import kernel_tools.kernels as kernels
-from kernel_tools.linalg import cusolver_eigh, cusolver_mg_eigh, cusolver_eigh_workspace_requirements, cusolver_mg_eigh_workspace_requirements
+from kernel_tools.linalg import *
 
-# torch.set_printoptions(linewidth=240)
+torch.set_printoptions(linewidth=240)
 
 kernel_fn = lambda x, z: kernels.laplacian(x, z, bandwidth=20.)
 dtype = torch.float64
 
-N = 100_000
+N = 10
 
 device_bytes, host_bytes = cusolver_eigh_workspace_requirements(N, dtype)
 print(f'device_bytes: {device_bytes}')
 print(f'host_bytes: {host_bytes}')
 
-device_elements = cusolver_mg_eigh_workspace_requirements(N, dtype, verbose=True, num_devices=4)
+device_elements = cusolver_mg_eigh_workspace_requirements(N, dtype, verbose=False, num_devices=4)
 print(f'device_elements: {device_elements}')
 print(f'device_bytes_requirement: {device_elements * dtype.itemsize}')
-# exit()
-exit()
 
 D = 2
 top_q_eig = 2
 
-# cusolver_eigh_workspace_requirements(N, torch.float64)
-# exit()
 a = torch.randn(N, D, dtype=torch.float64)
 
 kernel_mat = kernel_fn(a,a)
@@ -53,10 +49,9 @@ print(cuda_eigenvectors)
 print(end - start)
 
 kernel_mat_mg = kernel_mat_cpu.clone()
-cuda_mg_eigenvalues, cuda_mg_eigenvectors = cusolver_mg_eigh(kernel_mat_mg, verbose=True)
+cuda_mg_eigenvalues, cuda_mg_eigenvectors = cusolver_mg_eigh(kernel_mat_mg, verbose=False)
 print(cuda_mg_eigenvalues)
 print(cuda_mg_eigenvectors)
-exit()
 
 start = time.time()
 scipy_eigenvalues, scipy_eigenvectors = scipy_eigh(kernel_mat_cpu, subset_by_index=subset_by_index, eigvals_only=eigvals_only, overwrite_a=overwrite_a)

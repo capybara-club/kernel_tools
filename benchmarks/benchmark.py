@@ -29,13 +29,9 @@ def profile_cuda(N, num_eigs, dtype):
         return None
     
 
-def profile_cuda_mg(N, num_eigs, dtype):
+def profile_cuda_mg(N, dtype):
     a = torch.randn(N, D, dtype=dtype)
     kernel_mat = kernel_fn(a,a)
-    sub_start = N - num_eigs - 1
-    sub_end = N - 1
-    subset_by_index = (sub_start, sub_end)
-    eigvals_only = False
     overwrite_a = True
     kernel_mat_mg = kernel_mat
     
@@ -76,20 +72,20 @@ should_profile_cuda_mg = True
 if should_profile_scipy:
     for dtype in n_dtypes:
         for N, num_eigs in list(zip(n_sizes, n_eigs)):
-            scipy_time = profile_scipy(N, num_eigs, dtype)
+            run_time = profile_scipy(N, num_eigs, dtype)
 
-            print(f'N:{N}, num_eigs:{num_eigs}, dtype:{dtype}, scipy_time:{scipy_time}')
+            print(f'N:{N}, num_eigs:{num_eigs}, dtype:{dtype}, run_time:{run_time}')
 
 if should_profile_cuda:
     for dtype in n_dtypes:
         for N, num_eigs in list(zip(n_sizes, n_eigs)):
-            scipy_time = profile_cuda(N, num_eigs, dtype)
+            run_time = profile_cuda(N, num_eigs, dtype)
 
-            print(f'N:{N}, num_eigs:{num_eigs}, dtype:{dtype}, cuda_time:{scipy_time}')
+            print(f'N:{N}, num_eigs:{num_eigs}, dtype:{dtype}, run_time:{run_time}')
 
 if should_profile_cuda_mg:
     for dtype in n_dtypes:
         for N, num_eigs in list(zip(n_sizes, n_eigs)):
-            scipy_time = profile_cuda_mg(N, num_eigs, dtype)
+            run_time = profile_cuda_mg(N, num_eigs, dtype)
 
-            print(f'N:{N}, num_eigs:{num_eigs}, dtype:{dtype}, cuda_time:{scipy_time}')
+            print(f'N:{N}, num_eigs:{num_eigs}, dtype:{dtype}, run_time:{run_time}')
