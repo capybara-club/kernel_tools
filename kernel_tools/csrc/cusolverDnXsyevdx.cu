@@ -105,8 +105,6 @@ void cusolverDnXsyevdx_workspace_template(
         std::cerr << "Failed to run cusolverDnXsyevdx_bufferSize: " << status << std::endl;
         throw std::runtime_error("Failed to run cusolverDnXsyevdx_bufferSize");
     }
-
-    printf("cusolverDnXsyevdx workspace requested: device: %zu bytes, host: %zu bytes\n", *workspaceInBytesOnDevice, *workspaceInBytesOnHost);
 }
 
 template <typename data_type>
@@ -120,7 +118,8 @@ void cusolverDnXsyevdx_template(
     bool eigenvalues_only,
     bool eigen_range,
     uintptr_t stream_ptr,
-    cudaDataType_t cuda_data_type
+    cudaDataType_t cuda_data_type,
+    bool verbose
 ) {
     cusolverDnHandle_t handle = get_cusolver_dn_handle().get();
     // because pytorch is row major and cublas is column major, the triangle is flipped
@@ -156,7 +155,9 @@ void cusolverDnXsyevdx_template(
         handle, jobz, range, uplo, N, cuda_data_type, lda, il, iu, &workspaceInBytesOnDevice, &workspaceInBytesOnHost
     );
 
-    printf("cusolverDnXsyevdx workspace requested: device: %zu bytes, host: %zu bytes\n", workspaceInBytesOnDevice, workspaceInBytesOnHost);
+    if (verbose) {
+        printf("cusolverDnXsyevdx workspace requested: device: %zu bytes, host: %zu bytes\n", workspaceInBytesOnDevice, workspaceInBytesOnHost);
+    }
 
     void *cuda_data = cuda_alloc(workspaceInBytesOnDevice);
     void *host_data = host_alloc(workspaceInBytesOnHost);
@@ -186,13 +187,14 @@ void cusolverDnXsyevdx_template(
         info.data_ptr<int>()
     );
 
+    cuda_free(cuda_data);
+    host_free(host_data);
+
     if (status != CUSOLVER_STATUS_SUCCESS) {
         std::cerr << "Failed to run cusolverDnXsyevdx: " << status << std::endl;
         throw std::runtime_error("Failed to run cusolverDnXsyevdx");
     }
 
-    cuda_free(cuda_data);
-    host_free(host_data);
 }
 
 void cusolverDnXsyevdx_export(
@@ -204,17 +206,18 @@ void cusolverDnXsyevdx_export(
     bool upper_triangle,
     bool eigenvalues_only,
     bool eigen_range,
-    uintptr_t stream_ptr
+    uintptr_t stream_ptr,
+    bool verbose
 ) {
     if (a.dtype() == torch::kFloat32) {
         return cusolverDnXsyevdx_template<float>(
-            a, w, info, il, iu, upper_triangle, eigenvalues_only, eigen_range, stream_ptr, CUDA_R_32F
+            a, w, info, il, iu, upper_triangle, eigenvalues_only, eigen_range, stream_ptr, CUDA_R_32F, verbose
         );
     } 
 
     if (a.dtype() == torch::kFloat64) {
         return cusolverDnXsyevdx_template<double>(
-            a, w, info, il, iu, upper_triangle, eigenvalues_only, eigen_range, stream_ptr, CUDA_R_64F
+            a, w, info, il, iu, upper_triangle, eigenvalues_only, eigen_range, stream_ptr, CUDA_R_64F, verbose
         );
     }
 
@@ -222,3 +225,50 @@ void cusolverDnXsyevdx_export(
     throw std::runtime_error("Tensor needs to have dtype either float32 or float64");
 }
 
+void cusolverDnXsyevdx_workspace_query_export(
+    int N,
+    bool is_fp32,
+    torch::Tensor workspaceBytesDevice,
+    torch::Tensor workspaceBytesHost
+) {
+    if (workspaceBytesDevice.dtype() != torch::kUInt64 || workspaceBytesHost.dtype() != torch::kUInt64) {
+        throw std::runtime_error("Workspace sizes needs to have dtype uint64");
+    }
+
+    if (workspaceBytesDevice.numel() != 1 || workspaceBytesHost.numel() != 1) {
+        throw std::runtime_error("Workspace sizes need to have only one element");
+    }
+
+    // These don't appear to affect the workspace sizes
+    bool eigen_range = true;
+    bool upper_triangle = true;
+    bool eigenvalues_only = false;
+
+    cusolverDnHandle_t handle = get_cusolver_dn_handle().get();
+    // because pytorch is row major and cublas is column major, the triangle is flipped
+    cusolverEigRange_t range = eigen_range ? CUSOLVER_EIG_RANGE_I : CUSOLVER_EIG_RANGE_ALL;
+    cublasFillMode_t uplo = upper_triangle ? CUBLAS_FILL_MODE_UPPER : CUBLAS_FILL_MODE_LOWER;
+    cusolverEigMode_t jobz = eigenvalues_only ? CUSOLVER_EIG_MODE_NOVECTOR : CUSOLVER_EIG_MODE_VECTOR;
+
+    size_t workspaceInBytesOnDevice;
+    size_t workspaceInBytesOnHost;
+
+    int lda = N;
+    int il = 0;
+    int iu = 0;
+
+    if (is_fp32) {
+        cudaDataType cuda_data_type = CUDA_R_32F;
+        cusolverDnXsyevdx_workspace_template<float>(
+            handle, jobz, range, uplo, N, cuda_data_type, lda, il, iu, &workspaceInBytesOnDevice, &workspaceInBytesOnHost
+        );
+    } else {
+        cudaDataType cuda_data_type = CUDA_R_64F;
+        cusolverDnXsyevdx_workspace_template<double>(
+            handle, jobz, range, uplo, N, cuda_data_type, lda, il, iu, &workspaceInBytesOnDevice, &workspaceInBytesOnHost
+        );
+    }
+
+    *workspaceBytesDevice.data_ptr<size_t>() = workspaceInBytesOnDevice;
+    *workspaceBytesHost.data_ptr<size_t>() = workspaceInBytesOnHost;
+}

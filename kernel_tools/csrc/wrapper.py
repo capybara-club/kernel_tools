@@ -30,6 +30,7 @@ def load_jit():
     return kernel
 
 USE_JIT = os.getenv('USE_KERNEL_TOOLS_JIT', '0') == '1'
+USE_VERBOSE = os.getenv('USE_KERNEL_TOOLS_VERBOSE', '0') == '1'
 
 @singleton
 class SingletonClass:
@@ -37,11 +38,13 @@ class SingletonClass:
         try:
             # Installation via pip
             if USE_JIT:
-                print('Running kernel_tools JIT (first run can take a minute)')
+                if USE_VERBOSE:
+                    print('Running kernel_tools JIT (first run can take a minute)')
                 kernel = load_jit()
             else:
                 try:
-                    print('Running kernel_tools Compiled')
+                    if USE_VERBOSE:
+                        print('Running kernel_tools Compiled')
                     import kernel_tools_cpp_cuda as kernel
                 except ImportError as e:
                     print(f"ImportError: {e}")
@@ -75,7 +78,8 @@ def syevdx(
         overwrite_a = False,
         subset_by_index = None, 
         lower = True, 
-        eigvals_only = False
+        eigvals_only = False,
+        verbose = False
 ):
 
     if not a.is_cuda:
@@ -131,7 +135,8 @@ def syevdx(
         is_upper_triangle_column_major, 
         eigvals_only, 
         eigenvalue_range, 
-        stream.cuda_stream
+        stream.cuda_stream,
+        verbose
     )
 
     cpu_info = info.cpu()
@@ -150,6 +155,23 @@ def syevdx(
             return w
         else:
             return w, out
+        
+def syevdx_workspace_query(
+        N,
+        dtype
+):
+    if dtype != torch.float32 and dtype != torch.float64:
+        raise ValueError("Unsupported dtype")
+    is_fp32 = dtype == torch.float32
+    workspaceBytesDeviceTensor = torch.tensor(0, dtype=torch.uint64)
+    workspaceBytesHostTensor = torch.tensor(0, dtype=torch.uint64)
+    SingletonClass().kernel.cusolverDnXsyevdx_workspace_query_export(
+        N,
+        is_fp32,
+        workspaceBytesDeviceTensor,
+        workspaceBytesHostTensor
+    )
+    return workspaceBytesDeviceTensor.item(), workspaceBytesHostTensor.item()
 
 def mgSyevd(a, overwrite_a = False):
     N = a.size(0)

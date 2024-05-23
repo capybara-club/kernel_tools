@@ -1,11 +1,12 @@
-from .csrc.wrapper import mgSyevd, syevdx
+from .csrc.wrapper import mgSyevd, syevdx, syevdx_workspace_query
 
 def cusolver_eigh(
         a,
         overwrite_a = False,
         subset_by_index = None, 
         lower = True, 
-        eigvals_only = False
+        eigvals_only = False,
+        verbose = False
 ):
     """
     Uses cusolver cusolverDnXsyevdx to either get all the eigenvalues / eigenvectors
@@ -27,6 +28,7 @@ def cusolver_eigh(
     lower: Use the lower triangle, if false, use the upper triangle of the symmetric matrix
     eigvals_only: Only return the eigenvalues of a. If overwrite_a is True, then
         'a' will not be copied and this routine will still destroy 'a'.
+    verbose: Currently only prints the requested workspace size. This is useful if you are crashing.
     
     Returns:
     eigenvalues, eigenvectors of the range specified if eigvals_only is false
@@ -39,6 +41,22 @@ def cusolver_eigh(
                   lower=lower, 
                   eigvals_only=eigvals_only
             )
+
+def cusolver_eigh_workspace_requirements(N, dtype):
+    """
+    Returns the workspace required bytes for cusolver cusolverDnXsyevdx for the 
+    specified problem size and data type. Only torch.float32 and torch.float64 are
+    supported.
+
+    Parameters:
+    N (torch::Tensor): The size of the symmetric matrix to extract eigenvalues/eigenvectors from
+    dtype: The data type of the matrix
+    
+    Returns:
+    workspaceInBytesDevice, workspaceInBytesHost
+    """
+
+    return syevdx_workspace_query(N, dtype)
 
 def cusolver_mg_eigh(
     a,

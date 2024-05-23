@@ -4,16 +4,24 @@ import time
 from scipy.linalg import eigh as scipy_eigh
 
 import kernel_tools.kernels as kernels
-from kernel_tools.linalg import cusolver_eigh, cusolver_mg_eigh
+from kernel_tools.linalg import cusolver_eigh, cusolver_mg_eigh, cusolver_eigh_workspace_requirements
 
 # torch.set_printoptions(linewidth=240)
 
 kernel_fn = lambda x, z: kernels.laplacian(x, z, bandwidth=20.)
 
-N = 10
+N = 2_000
+
+device_bytes, host_bytes = cusolver_eigh_workspace_requirements(N, torch.float64)
+print(f'device_bytes: {device_bytes}')
+print(f'host_bytes: {host_bytes}')
+# exit()
+
 D = 2
 top_q_eig = 2
 
+# cusolver_eigh_workspace_requirements(N, torch.float64)
+# exit()
 a = torch.randn(N, D, dtype=torch.float64)
 
 kernel_mat = kernel_fn(a,a)
@@ -27,6 +35,7 @@ overwrite_a = True
 
 kernel_mat_cuda = kernel_mat.to(device='cuda')
 kernel_mat_cpu = kernel_mat.cpu()
+
 
 start = time.time()
 cuda_eigenvalues, cuda_eigenvectors = cusolver_eigh(kernel_mat_cuda, subset_by_index=subset_by_index, eigvals_only=eigvals_only, overwrite_a=overwrite_a)
