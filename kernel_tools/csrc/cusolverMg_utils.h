@@ -48,71 +48,74 @@
  *
  * The function restores the input device before leaving.
  */
-static void enablePeerAccess(const int nbGpus, const int *deviceList) {
+static cudaError_t enablePeerAccess(const int nbGpus, const int *deviceList) {
     int currentDevice = 0;
-    CUDA_CHECK(cudaGetDevice(&currentDevice));
+    CUDA_CHECK_RET(cudaGetDevice(&currentDevice));
 
     /* Remark: access granted by this cudaDeviceEnablePeerAccess is unidirectional */
     /* Rows and columns represents a connectivity matrix between GPUs in the system */
     for (int row = 0; row < nbGpus; row++) {
-        CUDA_CHECK(cudaSetDevice(row));
+        CUDA_CHECK_RET(cudaSetDevice(row));
         for (int col = 0; col < nbGpus; col++) {
             if (row != col) {
                 int canAccessPeer = 0;
-                CUDA_CHECK(cudaDeviceCanAccessPeer(&canAccessPeer, row, col));
+                CUDA_CHECK_RET(cudaDeviceCanAccessPeer(&canAccessPeer, row, col));
                 if (canAccessPeer) {
                     std::printf("\t Enable peer access from gpu %d to gpu %d\n", row, col);
-                    CUDA_CHECK(cudaDeviceEnablePeerAccess(col, 0));
+                    CUDA_CHECK_RET(cudaDeviceEnablePeerAccess(col, 0));
                 }
             }
         }
     }
-    CUDA_CHECK(cudaSetDevice(currentDevice));
+    CUDA_CHECK_RET(cudaSetDevice(currentDevice));
+    return cudaSuccess;
 }
 
-static void workspaceFree(int num_devices, const int *deviceIdA, /* <int> dimension num_devices */
+static cudaError_t workspaceFree(int num_devices, const int *deviceIdA, /* <int> dimension num_devices */
                           void **array_d_work                    /* <t> num_devices, host array */
                           /* array_d_work[j] points to device workspace of device j */
 ) {
     int currentDev = 0; /* record current device ID */
-    CUDA_CHECK(cudaGetDevice(&currentDev));
+    CUDA_CHECK_RET(cudaGetDevice(&currentDev));
 
     for (int idx = 0; idx < num_devices; idx++) {
         int deviceId = deviceIdA[idx];
         /* WARNING: we need to set device before any runtime API */
-        CUDA_CHECK(cudaSetDevice(deviceId));
+        CUDA_CHECK_RET(cudaSetDevice(deviceId));
 
         if (NULL != array_d_work[idx]) {
-            CUDA_CHECK(cudaFree(array_d_work[idx]));
+            CUDA_CHECK_RET(cudaFree(array_d_work[idx]));
         }
     }
-    CUDA_CHECK(cudaSetDevice(currentDev));
+    CUDA_CHECK_RET(cudaSetDevice(currentDev));
+    return cudaSuccess;
 }
 
-static void workspaceAlloc(int num_devices, const int *deviceIdA, /* <int> dimension num_devices */
+static cudaError_t workspaceAlloc(int num_devices, const int *deviceIdA, /* <int> dimension num_devices */
                            size_t sizeInBytes,                    /* number of bytes per device */
                            void **array_d_work                    /* <t> num_devices, host array */
                            /* array_d_work[j] points to device workspace of device j */
 ) {
     int currentDev = 0; /* record current device ID */
-    CUDA_CHECK(cudaGetDevice(&currentDev));
+    CUDA_CHECK_RET(cudaGetDevice(&currentDev));
 
     for (int idx = 0; idx < num_devices; idx++) {
         int deviceId = deviceIdA[idx];
         /* WARNING: we need to set device before any runtime API */
-        CUDA_CHECK(cudaSetDevice(deviceId));
+        CUDA_CHECK_RET(cudaSetDevice(deviceId));
 
         void *d_workspace = NULL;
 
-        CUDA_CHECK(cudaMalloc(&d_workspace, sizeInBytes));
+        CUDA_CHECK_RET(cudaMalloc(&d_workspace, sizeInBytes));
         array_d_work[idx] = d_workspace;
     }
-    CUDA_CHECK(cudaSetDevice(currentDev));
+    CUDA_CHECK_RET(cudaSetDevice(currentDev));
+    return cudaSuccess;
 }
 
 /* create a empty matrix A with A := 0 */
 template <typename T_ELEM>
-void createMat(int num_devices, const int *deviceIdA, /* <int> dimension num_devices */
+cudaError_t createMat(int num_devices, const int *deviceIdA, /* <int> dimension num_devices */
                int N_A,                               /* number of columns of global A */
                int T_A,                               /* number of columns per column tile */
                int LLD_A,                             /* leading dimension of local A */
@@ -120,40 +123,42 @@ void createMat(int num_devices, const int *deviceIdA, /* <int> dimension num_dev
                                   // std::vector<T_ELEM*>array_d_A
 ) {
     int currentDev = 0; /* record current device id */
-    CUDA_CHECK(cudaGetDevice(&currentDev));
-    CUDA_CHECK(cudaDeviceSynchronize());
+    CUDA_CHECK_RET(cudaGetDevice(&currentDev));
+    CUDA_CHECK_RET(cudaDeviceSynchronize());
     const int A_num_blks = (N_A + T_A - 1) / T_A;
     const int max_A_num_blks_per_device = (A_num_blks + num_devices - 1) / num_devices;
     /* Allocate base pointers */
     for (int p = 0; p < num_devices; p++) {
-        CUDA_CHECK(cudaSetDevice(deviceIdA[p]));
+        CUDA_CHECK_RET(cudaSetDevice(deviceIdA[p]));
         /* Allocate max_A_num_blks_per_device blocks per device */
-        CUDA_CHECK(
+        CUDA_CHECK_RET(
             cudaMalloc(&(array_d_A[p]), sizeof(T_ELEM) * LLD_A * T_A * max_A_num_blks_per_device));
         /* A := 0 */
-        CUDA_CHECK(
+        CUDA_CHECK_RET(
             cudaMemset(array_d_A[p], 0, sizeof(T_ELEM) * LLD_A * T_A * max_A_num_blks_per_device));
     }
-    CUDA_CHECK(cudaDeviceSynchronize());
-    CUDA_CHECK(cudaSetDevice(currentDev));
+    CUDA_CHECK_RET(cudaDeviceSynchronize());
+    CUDA_CHECK_RET(cudaSetDevice(currentDev));
+    return cudaSuccess;
 }
 
-static void destroyMat(int num_devices, const int *deviceIdA, /* <int> dimension num_devices */
+static cudaError_t destroyMat(int num_devices, const int *deviceIdA, /* <int> dimension num_devices */
                        int N_A,                               /* number of columns of global A */
                        int T_A,          /* number of columns per column tile */
                        void **array_d_A) /* host pointer array of dimension num_devices */
 {
     int currentDev = 0; /* record current device id */
-    CUDA_CHECK(cudaGetDevice(&currentDev));
+    CUDA_CHECK_RET(cudaGetDevice(&currentDev));
 
     for (int p = 0; p < num_devices; p++) {
-        CUDA_CHECK(cudaSetDevice(deviceIdA[p]));
+        CUDA_CHECK_RET(cudaSetDevice(deviceIdA[p]));
 
         if (NULL != array_d_A[p]) {
-            CUDA_CHECK(cudaFree(array_d_A[p]));
+            CUDA_CHECK_RET(cudaFree(array_d_A[p]));
         }
     }
-    CUDA_CHECK(cudaSetDevice(currentDev));
+    CUDA_CHECK_RET(cudaSetDevice(currentDev));
+    return cudaSuccess;
 }
 
 template <typename T_ELEM>
@@ -181,7 +186,7 @@ mat_pack2unpack(int num_devices, int N_A,   /* number of columns of global A */
  *  A(IA:IA+M-1, JA:JA+N-1) := B(1:M, 1:N)
  */
 template <typename T_ELEM>
-static void memcpyH2D(int num_devices, const int *deviceIdA, /* <int> dimension num_devices */
+static cudaError_t memcpyH2D(int num_devices, const int *deviceIdA, /* <int> dimension num_devices */
                       int M,                                 /* number of rows in local A, B */
                       int N,                                 /* number of columns in local A, B */
                                                              /* input */
@@ -199,16 +204,17 @@ static void memcpyH2D(int num_devices, const int *deviceIdA, /* <int> dimension 
 
     /*  Quick return if possible */
     if ((0 >= M) || (0 >= N)) {
-        return;
+        return cudaSuccess;
     }
 
     /* consistent checking */
     if (ldb < M) {
+        //TODO: return here?
         throw std::runtime_error("Consistency Error.");
     }
 
-    CUDA_CHECK(cudaGetDevice(&currentDev));
-    CUDA_CHECK(cudaDeviceSynchronize());
+    CUDA_CHECK_RET(cudaGetDevice(&currentDev));
+    CUDA_CHECK_RET(cudaDeviceSynchronize());
 
     const int num_blks = (N_A + T_A - 1) / T_A;
 
@@ -252,22 +258,23 @@ static void memcpyH2D(int num_devices, const int *deviceIdA, /* <int> dimension 
                 array_d_A_unpacked[JA_blk_id] + IDX2F(loc_A_start_row, loc_A_start_col, LLD_A);
             const T_ELEM *h_A = h_B + IDX2F(A_start_row - IA + 1, A_start_col - JA + 1, ldb);
 
-            CUDA_CHECK(cudaMemcpy2D(d_A,                                              /* dst */
+            CUDA_CHECK_RET(cudaMemcpy2D(d_A,                                              /* dst */
                                     static_cast<size_t>(LLD_A) * sizeof(T_ELEM), h_A, /* src */
                                     static_cast<size_t>(ldb) * sizeof(T_ELEM),
                                     static_cast<size_t>(M) * sizeof(T_ELEM),
                                     static_cast<size_t>(IT_A), cudaMemcpyHostToDevice));
         } /* for each tile per device */
     }     /* for each device */
-    CUDA_CHECK(cudaDeviceSynchronize());
-    CUDA_CHECK(cudaSetDevice(currentDev));
+    CUDA_CHECK_RET(cudaDeviceSynchronize());
+    CUDA_CHECK_RET(cudaSetDevice(currentDev));
+    return cudaSuccess;
 }
 
 /*
  *  B(1:M, 1:N) := A(IA:IA+M-1, JA:JA+N-1)
  */
 template <typename T_ELEM>
-static void memcpyD2H(int num_devices, const int *deviceIdA, /* <int> dimension num_devices */
+static cudaError_t memcpyD2H(int num_devices, const int *deviceIdA, /* <int> dimension num_devices */
                       int M,                                 /* number of rows in local A, B */
                       int N,                                 /* number of columns in local A, B */
                                                              /* input */
@@ -284,16 +291,17 @@ static void memcpyD2H(int num_devices, const int *deviceIdA, /* <int> dimension 
 
     /*  Quick return if possible */
     if ((0 >= M) || (0 >= N)) {
-        return;
+        return cudaSuccess;
     }
 
     /* consistent checking */
     if (ldb < M) {
+        //TODO: return here?
         throw std::runtime_error("Consistency Error.");
     }
 
-    CUDA_CHECK(cudaGetDevice(&currentDev));
-    CUDA_CHECK(cudaDeviceSynchronize());
+    CUDA_CHECK_RET(cudaGetDevice(&currentDev));
+    CUDA_CHECK_RET(cudaDeviceSynchronize());
 
     const int num_blks = (N_A + T_A - 1) / T_A;
     std::vector<T_ELEM *> array_d_A_unpacked(num_blks);
@@ -325,13 +333,14 @@ static void memcpyD2H(int num_devices, const int *deviceIdA, /* <int> dimension 
             const T_ELEM *d_A =
                 array_d_A_unpacked[JA_blk_id] + IDX2F(loc_A_start_row, loc_A_start_col, LLD_A);
             T_ELEM *h_A = h_B + IDX2F(A_start_row - IA + 1, A_start_col - JA + 1, ldb);
-            CUDA_CHECK(cudaMemcpy2D(h_A,                                            /* dst */
+            CUDA_CHECK_RET(cudaMemcpy2D(h_A,                                            /* dst */
                                     static_cast<size_t>(ldb) * sizeof(T_ELEM), d_A, /* src */
                                     static_cast<size_t>(LLD_A) * sizeof(T_ELEM),
                                     static_cast<size_t>(M) * sizeof(T_ELEM),
                                     static_cast<size_t>(IT_A), cudaMemcpyDeviceToHost));
         } /* for each tile per device */
     }     /* for each device */
-    CUDA_CHECK(cudaDeviceSynchronize());
-    CUDA_CHECK(cudaSetDevice(currentDev));
+    CUDA_CHECK_RET(cudaDeviceSynchronize());
+    CUDA_CHECK_RET(cudaSetDevice(currentDev));
+    return cudaSuccess;
 }

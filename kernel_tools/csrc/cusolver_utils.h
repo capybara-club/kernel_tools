@@ -51,6 +51,24 @@
         }                                                                                          \
     } while (0)
 
+#define CUDA_CHECK_RET(err)                                                                        \
+    do {                                                                                           \
+        cudaError_t err_ = (err);                                                                  \
+        if (err_ != cudaSuccess) {                                                                 \
+            printf("CUDA error %d at %s:%d\n", err_, __FILE__, __LINE__);                          \
+            return err;                                                                            \
+        }                                                                                          \
+    } while (0)
+
+#define CUDA_CHECK_BREAK(err)                                                                      \
+    do {                                                                                           \
+        cudaError_t err_ = (err);                                                                  \
+        if (err_ != cudaSuccess) {                                                                 \
+            printf("CUDA error %d at %s:%d\n", err_, __FILE__, __LINE__);                          \
+            break;                                                                                 \
+        }                                                                                          \
+    } while (0)
+
 // cusolver API error checking
 #define CUSOLVER_CHECK(err)                                                                        \
     do {                                                                                           \
@@ -58,6 +76,15 @@
         if (err_ != CUSOLVER_STATUS_SUCCESS) {                                                     \
             printf("cusolver error %d at %s:%d\n", err_, __FILE__, __LINE__);                      \
             throw std::runtime_error("cusolver error");                                            \
+        }                                                                                          \
+    } while (0)
+
+#define CUSOLVER_CHECK_BREAK(err)                                                                  \
+    do {                                                                                           \
+        cusolverStatus_t err_ = (err);                                                             \
+        if (err_ != CUSOLVER_STATUS_SUCCESS) {                                                     \
+            printf("cusolver error %d at %s:%d\n", err_, __FILE__, __LINE__);                      \
+            break;                                                                                 \
         }                                                                                          \
     } while (0)
 
