@@ -61,6 +61,7 @@ def cusolver_eigh_workspace_requirements(N, dtype):
 def cusolver_mg_eigh(
     a,
     overwrite_a = False,
+    max_num_devices = 16,
     verbose = False
 ):
     """
@@ -77,7 +78,7 @@ def cusolver_mg_eigh(
     Returns:
     eigenvalues, eigenvectors
     """
-    return mgSyevd(a, overwrite_a=overwrite_a, verbose=verbose)
+    return mgSyevd(a, overwrite_a=overwrite_a, max_num_devices=max_num_devices, verbose=verbose)
 
 def cusolver_mg_eigh_workspace_requirements(N, dtype, num_devices=None, verbose=False):
     """

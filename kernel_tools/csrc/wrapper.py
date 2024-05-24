@@ -173,7 +173,7 @@ def syevdx_workspace_query(
     )
     return workspaceBytesDeviceTensor.item(), workspaceBytesHostTensor.item()
 
-def mgSyevd(a, overwrite_a = False, verbose = False):
+def mgSyevd(a, overwrite_a = False, max_num_devices=16, verbose = False):
     cuda.empty_cache()
     N = a.size(0)
     d = torch.zeros(N, dtype=a.dtype, device=a.device)
@@ -181,7 +181,7 @@ def mgSyevd(a, overwrite_a = False, verbose = False):
         out = a.clone()
     else:
         out = a
-    SingletonClass().kernel.cusolverMgSyevd_export(out, d, verbose)
+    SingletonClass().kernel.cusolverMgSyevd_export(out, d, max_num_devices, verbose)
     return d, out.T
 
 def mgSyevd_workspace_query(

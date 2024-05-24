@@ -66,7 +66,6 @@
 class CuSolverMgHandle {
 public:
     CuSolverMgHandle() {
-        printf("create handle\n");
         cusolverStatus_t status = cusolverMgCreate(&handle);
         if (status != CUSOLVER_STATUS_SUCCESS) {
             throw std::runtime_error("Failed to create cuSolver handle");
@@ -186,19 +185,20 @@ template <typename T>
 void cusolverMgSyevd_template(
     torch::Tensor a, 
     torch::Tensor d,
+    int max_devices,
     bool verbose
 ) {
 
     size_t start_free_mem, end_free_mem, total_mem;
     CUDA_CHECK( cudaMemGetInfo(&start_free_mem, &total_mem) );
-    printf("start: %zu\n", start_free_mem);
+    if (verbose) printf("start: %zu\n", start_free_mem);
 
     using data_type = T;
 
     cusolverMgHandle_t cusolverH = get_cusolver_mg_handle().get();
 
     /* maximum number of GPUs */
-    const int MAX_NUM_DEVICES = 16;
+    const int MAX_NUM_DEVICES = max_devices;
 
     int nbGpus = 0;
     std::vector<int> deviceList(MAX_NUM_DEVICES);
@@ -404,9 +404,9 @@ void cusolverMgSyevd_template(
     CUSOLVER_CHECK(cuda_solver_status);
 
     CUDA_CHECK( cudaMemGetInfo(&end_free_mem, &total_mem) );
-    printf("end: %zu\n", end_free_mem);
-    printf("difference: %zu\n", end_free_mem - start_free_mem);
-    printf("difference: %zu\n", start_free_mem - end_free_mem);
+    if (verbose) printf("end: %zu\n", end_free_mem);
+    if (verbose) printf("difference: %zu\n", end_free_mem - start_free_mem);
+    if (verbose) printf("difference: %zu\n", start_free_mem - end_free_mem);
 }
 
 static void signal_handler(int signum) {
@@ -416,6 +416,7 @@ static void signal_handler(int signum) {
 void cusolverMgSyevd_export(
     torch::Tensor a, 
     torch::Tensor d,
+    int max_devices,
     bool verbose
 ) {
     signal(SIGINT, signal_handler);
@@ -433,10 +434,10 @@ void cusolverMgSyevd_export(
         throw std::runtime_error("Matrix needs to be square");
 
     if (a.dtype() == torch::kFloat32) 
-        return cusolverMgSyevd_template<float>(a, d, verbose);
+        return cusolverMgSyevd_template<float>(a, d, max_devices, verbose);
 
     if (a.dtype() == torch::kFloat64) 
-        return cusolverMgSyevd_template<double>(a, d, verbose);
+        return cusolverMgSyevd_template<double>(a, d, max_devices, verbose);
 
     // If it gets here the dtype isn't supported
     throw std::runtime_error("Tensor needs to have dtype either float32 or float64");
@@ -451,7 +452,7 @@ void cusolverMgSyevd_workspace_query_export(
     bool verbose
 ) {
     signal(SIGINT, signal_handler);
-    
+
     if (workspace_num_elements.dtype() != torch::kInt64) {
         throw std::runtime_error("workspace_num_elements tensor needs to have dtype int64");
     }

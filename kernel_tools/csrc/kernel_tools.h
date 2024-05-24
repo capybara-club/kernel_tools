@@ -25,6 +25,7 @@ void cusolverDnXsyevdx_workspace_query_export(
 void cusolverMgSyevd_export(
     torch::Tensor a, 
     torch::Tensor d,
+    int max_devices,
     bool verbose
 );
 
