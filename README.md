@@ -1,33 +1,35 @@
 # kernel_tools
 Tools for kernel methods for PyTorch and Cuda devices
 
-## Linalg
-Exports two cusolver functions, cusolverSyevdx and cusolverMgsyevd.
+This library uses .cu/.cpp c++ code. It can be installed with `pip install .` or for development with `pip install -e .` You might need to install python development headers and tools like setuptools to get this working.
+
+Installation compiles the .cu/.cpp files and can take a very long time.
+
+## linalg
+Exports two [cuSOLVER](https://docs.nvidia.com/cuda/cusolver/) functions:
+* [cusolverDnXsyevdx](https://docs.nvidia.com/cuda/cusolver/#cusolverdnxgesvd)
+* [cusolverMgSyevd](https://docs.nvidia.com/cuda/cusolver/#cusolvermgsyevd)
 
 ### cusolverdnxsyevdx
 
-cuSolver Documentation: [cusolverDnXsyevdx](https://docs.nvidia.com/cuda/cusolver/#dense-eigenvalue-solver-reference-64-bit-api)
-
 This function extracts eigenvalues/eigenvectors by an index. This can extract the top few
-eigenvalues/eigenvectors of a system. Function runs on one Nvidia device.
+eigenvalues/eigenvectors of a system. This function runs on one Nvidia device.
 
-This function is available in `kernel_tools.linalg.cusolver_eigh`
+This function is available in this library at `kernel_tools.linalg.cusolver_eigh`
 
 The function to estimate workspace size for a future run is `kernel_tools.linalg.cusolver_eigh_workspace_requirements`
 
 ### cusolverMgsyevd
 
-cuSolver Documentation: [cusolverMgSyevd](https://docs.nvidia.com/cuda/cusolver/#cusolvermgsyevd)
-
 This function extracts all eigenvalues/eigenvectors of a system. This function uses all
 visible Nvidia devices to split the work and share data across NVlink if available.
 
-This function is available in `kernel_tools.linalg.cusolver_mg_eigh`
+This function is available in this library at `kernel_tools.linalg.cusolver_mg_eigh`
 
 The function to estimate workspace size for a future run is `kernel_tools.linalg.cusolver_mg_eigh_workspace_requirements`
 
 #### WARNING:
-There is currently an issue with reusing the `cusolverMgHandle_t` for multiple runs in the same context. It seems that even destroying the handle and creating a new one has the same issue. The only workaround appears to be leaking memory by creating a new handle for each run and leaving the old ones stagnant. A bug report was filed to Nvidia for this.
+There is currently an issue with reusing the `cusolverMgHandle_t` for multiple runs in the same context. It seems that even destroying the handle and creating a new one has the same issue. The only workaround appears to be leaking memory by creating a new handle for each run and leaving the old ones stagnant. A bug report was filed to Nvidia, waiting on followup.
 
 ## Environment Variables
 
