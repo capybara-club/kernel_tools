@@ -174,6 +174,7 @@ def syevdx_workspace_query(
     return workspaceBytesDeviceTensor.item(), workspaceBytesHostTensor.item()
 
 def mgSyevd(a, overwrite_a = False, verbose = False):
+    cuda.empty_cache()
     N = a.size(0)
     d = torch.zeros(N, dtype=a.dtype, device=a.device)
     if not overwrite_a:

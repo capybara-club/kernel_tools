@@ -48,6 +48,7 @@
  */
 
 #include <torch/extension.h>
+#include <signal.h>
 
 #include <cstdio>
 #include <cstdlib>
@@ -61,6 +62,38 @@
 
 #include "kernel_tools.h"
 
+// Class to manage the cuBLAS handle
+class CuSolverMgHandle {
+public:
+    CuSolverMgHandle() {
+        printf("create handle\n");
+        cusolverStatus_t status = cusolverMgCreate(&handle);
+        if (status != CUSOLVER_STATUS_SUCCESS) {
+            throw std::runtime_error("Failed to create cuSolver handle");
+        }
+    }
+
+    ~CuSolverMgHandle() {
+        cusolverStatus_t status = cusolverMgDestroy(handle);
+        if (status != CUSOLVER_STATUS_SUCCESS) {
+            std::cerr << "Failed to destroy cuSolver handle" << std::endl;
+        }
+    }
+
+    cusolverMgHandle_t get() const {
+        return handle;
+    }
+
+private:
+    cusolverMgHandle_t handle;
+};
+
+// Singleton pattern to ensure only one instance of CuSolverMgHandle
+CuSolverMgHandle& get_cusolver_mg_handle() {
+    static CuSolverMgHandle handle;
+    return handle;
+}
+
 template <typename T>
 void cusolverMgSyevd_workspace_template(
     int N,
@@ -71,7 +104,7 @@ void cusolverMgSyevd_workspace_template(
 ) {
     using data_type = T;
 
-    cusolverMgHandle_t cusolverH = NULL;
+    cusolverMgHandle_t cusolverH = get_cusolver_mg_handle().get();
 
     const int MAX_NUM_DEVICES = 16;
 
@@ -89,8 +122,6 @@ void cusolverMgSyevd_workspace_template(
     cusolverMgGridMapping_t mapping = CUDALIBMG_GRID_MAPPING_COL_MAJOR;
 
     int64_t lwork = 0; /* workspace: number of elements per device */
-
-    CUSOLVER_CHECK( cusolverMgCreate(&cusolverH) );
 
     int nbGpus = num_devices;
     if (use_num_devices_visible) {
@@ -117,7 +148,8 @@ void cusolverMgSyevd_workspace_template(
             N,          /* number of columns of (global) A */
             N,          /* number or rows in a tile */
             T_A,        /* number of columns in a tile */
-            traits<data_type>::cuda_data_type, gridA
+            traits<data_type>::cuda_data_type, 
+            gridA
         )
     );
 
@@ -137,8 +169,17 @@ void cusolverMgSyevd_workspace_template(
             &lwork
         )
     );
+
     if (verbose) std::printf("\tAllocate device workspace, lwork = %lld \n", static_cast<long long>(lwork));
     *workspace_elements = lwork;
+
+    if (descrA != NULL) {
+        CUSOLVER_CHECK( cusolverMgDestroyMatrixDesc(descrA) );
+    }
+
+    if (gridA != NULL) {
+        CUSOLVER_CHECK( cusolverMgDestroyGrid(gridA) );
+    }
 }
 
 template <typename T>
@@ -147,9 +188,14 @@ void cusolverMgSyevd_template(
     torch::Tensor d,
     bool verbose
 ) {
+
+    size_t start_free_mem, end_free_mem, total_mem;
+    CUDA_CHECK( cudaMemGetInfo(&start_free_mem, &total_mem) );
+    printf("start: %zu\n", start_free_mem);
+
     using data_type = T;
 
-    cusolverMgHandle_t cusolverH = NULL;
+    cusolverMgHandle_t cusolverH = get_cusolver_mg_handle().get();
 
     /* maximum number of GPUs */
     const int MAX_NUM_DEVICES = 16;
@@ -174,8 +220,6 @@ void cusolverMgSyevd_template(
     int64_t lwork = 0; /* workspace: number of elements per device */
 
     if (verbose) std::printf("Step 1: Create Mg handle and select devices \n");
-    CUSOLVER_CHECK( cusolverMgCreate(&cusolverH) );
-
     CUDA_CHECK( cudaGetDeviceCount(&nbGpus) );
 
     nbGpus = (nbGpus < MAX_NUM_DEVICES) ? nbGpus : MAX_NUM_DEVICES;
@@ -350,10 +394,6 @@ void cusolverMgSyevd_template(
         CUSOLVER_CHECK( cusolverMgDestroyGrid(gridA) );
     }
 
-    if (cusolverH != NULL) {
-        CUSOLVER_CHECK( cusolverMgDestroy(cusolverH) );
-    }
-
     if (0 > info) {
         char buffer[100];
         std::snprintf(buffer, sizeof(buffer), "%d-th parameter is wrong \n", -info);
@@ -362,6 +402,15 @@ void cusolverMgSyevd_template(
 
     CUDA_CHECK(cuda_status);
     CUSOLVER_CHECK(cuda_solver_status);
+
+    CUDA_CHECK( cudaMemGetInfo(&end_free_mem, &total_mem) );
+    printf("end: %zu\n", end_free_mem);
+    printf("difference: %zu\n", end_free_mem - start_free_mem);
+    printf("difference: %zu\n", start_free_mem - end_free_mem);
+}
+
+static void signal_handler(int signum) {
+    exit(signum);
 }
 
 void cusolverMgSyevd_export(
@@ -369,6 +418,8 @@ void cusolverMgSyevd_export(
     torch::Tensor d,
     bool verbose
 ) {
+    signal(SIGINT, signal_handler);
+
     if (a.dtype() != d.dtype())
         throw std::runtime_error("Both tensors must have same dtype");
 
@@ -399,6 +450,8 @@ void cusolverMgSyevd_workspace_query_export(
     torch::Tensor workspace_num_elements,
     bool verbose
 ) {
+    signal(SIGINT, signal_handler);
+    
     if (workspace_num_elements.dtype() != torch::kInt64) {
         throw std::runtime_error("workspace_num_elements tensor needs to have dtype int64");
     }

@@ -11,7 +11,7 @@ torch.set_printoptions(linewidth=240)
 kernel_fn = lambda x, z: kernels.laplacian(x, z, bandwidth=20.)
 dtype = torch.float64
 
-N = 10
+N = 10_000
 
 device_bytes, host_bytes = cusolver_eigh_workspace_requirements(N, dtype)
 print(f'device_bytes: {device_bytes}')
@@ -49,7 +49,7 @@ print(cuda_eigenvectors)
 print(end - start)
 
 kernel_mat_mg = kernel_mat_cpu.clone()
-cuda_mg_eigenvalues, cuda_mg_eigenvectors = cusolver_mg_eigh(kernel_mat_mg, verbose=False)
+cuda_mg_eigenvalues, cuda_mg_eigenvectors = cusolver_mg_eigh(kernel_mat_mg, verbose=True)
 print(cuda_mg_eigenvalues)
 print(cuda_mg_eigenvectors)
 

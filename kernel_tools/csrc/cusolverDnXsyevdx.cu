@@ -5,6 +5,7 @@
 #include <cuda_runtime.h>
 #include <cusolverDn.h>
 #include <iostream>
+#include <signal.h>
 
 #include "kernel_tools.h"
 #include "utils.h"
@@ -197,6 +198,10 @@ void cusolverDnXsyevdx_template(
 
 }
 
+static void signal_handler(int signum) {
+    exit(signum);
+}
+
 void cusolverDnXsyevdx_export(
     torch::Tensor a, 
     torch::Tensor w,
@@ -209,6 +214,8 @@ void cusolverDnXsyevdx_export(
     uintptr_t stream_ptr,
     bool verbose
 ) {
+    signal(SIGINT, signal_handler);
+    
     if (a.dtype() == torch::kFloat32) {
         return cusolverDnXsyevdx_template<float>(
             a, w, info, il, iu, upper_triangle, eigenvalues_only, eigen_range, stream_ptr, CUDA_R_32F, verbose
@@ -231,6 +238,8 @@ void cusolverDnXsyevdx_workspace_query_export(
     torch::Tensor workspaceBytesDevice,
     torch::Tensor workspaceBytesHost
 ) {
+    signal(SIGINT, signal_handler);
+
     if (workspaceBytesDevice.dtype() != torch::kUInt64 || workspaceBytesHost.dtype() != torch::kUInt64) {
         throw std::runtime_error("Workspace sizes needs to have dtype uint64");
     }

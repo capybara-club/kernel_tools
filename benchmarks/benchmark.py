@@ -37,7 +37,7 @@ def profile_cuda_mg(N, dtype):
     
     try:
         start = time.time()
-        cuda_eigenvalues, cuda_eigenvectors = cusolver_mg_eigh(kernel_mat_mg, overwrite_a=overwrite_a)
+        cuda_eigenvalues, cuda_eigenvectors = cusolver_mg_eigh(kernel_mat_mg, overwrite_a=overwrite_a, verbose=True)
         end = time.time()
         return end - start
     except:
@@ -61,9 +61,11 @@ def profile_scipy(N, num_eigs, dtype):
     end = time.time()
     return end - start
 
+# n_sizes = [10_000, 15_000, 20_000, 25_000]
 n_sizes = [100, 1_000, 2_000, 5_000, 10_000, 15_000, 20_000, 25_000, 30_000, 35_000, 40_000, 45_000, 50_000]
 n_eigs =  [ 10,    50,   100,   200,    500,    750,  1_000,  2_000,  3_000,  4_000,  5_000,  7_000,  9_000]
 n_dtypes = [torch.float32, torch.float64]
+# n_dtypes = [torch.float64]
 
 should_profile_scipy = False
 should_profile_cuda = False
@@ -85,7 +87,7 @@ if should_profile_cuda:
 
 if should_profile_cuda_mg:
     for dtype in n_dtypes:
-        for N, num_eigs in list(zip(n_sizes, n_eigs)):
-            run_time = profile_cuda_mg(N, num_eigs, dtype)
+        for N in n_sizes:
+            run_time = profile_cuda_mg(N, dtype)
 
-            print(f'N:{N}, num_eigs:{num_eigs}, dtype:{dtype}, run_time:{run_time}')
+            print(f'N:{N}, num_eigs:{N}, dtype:{dtype}, run_time:{run_time}')
