@@ -53,9 +53,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 
 #include <cuda_runtime.h>
 #include <cuda.h>
@@ -364,7 +361,7 @@ void cusolverMgSyevd_template(
         throw std::runtime_error(buffer);
     }
 
-    CUDA_CHECK(cuda_status);
+    CUDA_CHECK_VERBOSE(cuda_status, verbose);
     CUSOLVER_CHECK(cuda_solver_status);
 }
 
@@ -392,10 +389,6 @@ void cusolverMgSyevd_export(
     if (a.size(0) != a.size(1)) 
         throw std::runtime_error("Matrix needs to be square");
 
-    // Need to do this because there is a bug in cusolverMg handle creation/destruction. Pending fix...
-    // This shouldn't leak memory even with bug. I ran this 2000 times in a row watching vram usage.
-    // pid_t pid = fork();
-    // if (pid == 0) { // This is the child process
     if (a.dtype() != torch::kFloat32 && a.dtype() != torch::kFloat64) {
         throw std::runtime_error("Tensor needs to have dtype either float32 or float64");
     }
@@ -405,11 +398,6 @@ void cusolverMgSyevd_export(
     } else {
         cusolverMgSyevd_template<double>(a, d, max_devices, verbose);
     }
-    //     _exit(0); // Exit child process
-    // } else {
-    //     int status;
-    //     waitpid(pid, &status, 0);
-    // }
 }
 
 void cusolverMgSyevd_workspace_query_export(
@@ -432,18 +420,10 @@ void cusolverMgSyevd_workspace_query_export(
 
     int64_t num_workspace_elements;
 
-    // Need to do this because there is a bug in cusolverMg handle creation/destruction. Pending fix...
-    // pid_t pid = fork();
-    // if (pid == 0) { // This is the child process
     if (is_fp32) {
         cusolverMgSyevd_workspace_template<float>(N, num_devices, use_num_devices_visible, &num_workspace_elements, verbose);
     } else {
         cusolverMgSyevd_workspace_template<double>(N, num_devices, use_num_devices_visible, &num_workspace_elements, verbose);
     }
     *workspace_num_elements.data_ptr<int64_t>() = num_workspace_elements;
-    //     _exit(0); // Exit child process
-    // } else {
-    //     int status;
-    //     waitpid(pid, &status, 0);
-    // }
 }

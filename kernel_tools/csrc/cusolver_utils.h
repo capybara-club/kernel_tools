@@ -42,6 +42,15 @@
 #include <library_types.h>
 
 // CUDA API error checking
+#define CUDA_CHECK_VERBOSE(err, verbose)                                                           \
+    do {                                                                                           \
+        cudaError_t err_ = (err);                                                                  \
+        if (err_ != cudaSuccess) {                                                                 \
+            if (verbose) printf("CUDA error %d at %s:%d\n", err_, __FILE__, __LINE__);             \
+            throw std::runtime_error("CUDA error");                                                \
+        }                                                                                          \
+    } while (0)
+
 #define CUDA_CHECK(err)                                                                            \
     do {                                                                                           \
         cudaError_t err_ = (err);                                                                  \
@@ -55,7 +64,6 @@
     do {                                                                                           \
         cudaError_t err_ = (err);                                                                  \
         if (err_ != cudaSuccess) {                                                                 \
-            printf("CUDA error %d at %s:%d\n", err_, __FILE__, __LINE__);                          \
             return err;                                                                            \
         }                                                                                          \
     } while (0)
