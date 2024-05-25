@@ -76,11 +76,11 @@ def warmup():
 # Trying to match scipy eigh
 def syevdx(
         a,
-        overwrite_a = False,
-        subset_by_index = None, 
-        lower = True, 
-        eigvals_only = False,
-        verbose = False
+        overwrite_a,
+        subset_by_index, 
+        lower, 
+        eigvals_only,
+        verbose
 ):
 
     if not a.is_cuda:
