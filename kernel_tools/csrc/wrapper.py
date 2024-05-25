@@ -199,6 +199,7 @@ def mgSyevd(a, overwrite_a = False, max_num_devices=16, verbose = False):
     # hear back. However this would force any user to be using the latest cuda toolkit
     # version after patch.
     mp.set_start_method('spawn', force=True)
+    mp.freeze_support()
     p = mp.Process(target=call_mgSyevd, args=(out, d, max_num_devices, verbose))
     p.start()
     p.join()
@@ -233,6 +234,7 @@ def mgSyevd_workspace_query(
     workspaceNumElementsTensor = torch.tensor(0, dtype=torch.int64)
 
     mp.set_start_method('spawn', force=True)
+    mp.freeze_support()
     p = mp.Process(target=call_mgSyevd_workspace_query, args=(N, num_devices, is_fp32, use_num_devices_visible, workspaceNumElementsTensor, verbose))
     p.start()
     p.join()
