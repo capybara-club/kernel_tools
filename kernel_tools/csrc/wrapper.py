@@ -4,6 +4,7 @@ import sys
 import subprocess
 import torch
 import torch.cuda as cuda
+import multiprocessing as mp
 
 def singleton(cls):
     instances = {}
@@ -173,7 +174,11 @@ def syevdx_workspace_query(
     )
     return workspaceBytesDeviceTensor.item(), workspaceBytesHostTensor.item()
 
+def call_mgSyevd(out, d, max_num_devices, verbose):
+        SingletonClass().kernel.cusolverMgSyevd_export(out, d, max_num_devices, verbose)
+
 def mgSyevd(a, overwrite_a = False, max_num_devices=16, verbose = False):
+    # This function allocates outside of PyTorch, should release as much vram as possible before call.
     cuda.empty_cache()
     N = a.size(0)
     d = torch.zeros(N, dtype=a.dtype, device=a.device)
@@ -181,8 +186,34 @@ def mgSyevd(a, overwrite_a = False, max_num_devices=16, verbose = False):
         out = a.clone()
     else:
         out = a
-    SingletonClass().kernel.cusolverMgSyevd_export(out, d, max_num_devices, verbose)
+
+    # A cusolverMg bug made this insane. The cusolverMgHandle being reused will have 
+    # cusolverMgSyevd fail each subsequent call. If you destroy the handle and create a new
+    # one this issue somehow persists, even if the handle only had device select called on it. 
+    # The only other way is to create a new handle and leak 
+    # a somewhat substantial amount of vram for each handle. This was enough of a leak
+    # such that benchmarking increasily larger problem sizes made certain problem sizes impossible, 
+    # where individual runs would successfully complete. Apparently if you create a spawned process with its own
+    # cuda context, when that process died, all the memory is cleaned up and the 
+    # cusolverMgHandle issue is gone. I filed a bug report with Nvidia and I'm waiting to 
+    # hear back. However this would force any user to be using the latest cuda toolkit
+    # version after patch.
+    mp.set_start_method('spawn', force=True)
+    p = mp.Process(target=call_mgSyevd, args=(out, d, max_num_devices, verbose))
+    p.start()
+    p.join()
+
     return d, out.T
+
+def call_mgSyevd_workspace_query(N, num_devices, is_fp32, use_num_devices_visible, workspaceNumElementsTensor, verbose):
+    SingletonClass().kernel.cusolverMgSyevd_workspace_query_export(
+        N,
+        num_devices,
+        is_fp32,
+        use_num_devices_visible,
+        workspaceNumElementsTensor,
+        verbose
+    )
 
 def mgSyevd_workspace_query(
         N,
@@ -200,12 +231,10 @@ def mgSyevd_workspace_query(
         
     is_fp32 = dtype == torch.float32
     workspaceNumElementsTensor = torch.tensor(0, dtype=torch.int64)
-    SingletonClass().kernel.cusolverMgSyevd_workspace_query_export(
-        N,
-        num_devices,
-        is_fp32,
-        use_num_devices_visible,
-        workspaceNumElementsTensor,
-        verbose
-    )
-    return workspaceNumElementsTensor.item()
+
+    mp.set_start_method('spawn', force=True)
+    p = mp.Process(target=call_mgSyevd_workspace_query, args=(N, num_devices, is_fp32, use_num_devices_visible, workspaceNumElementsTensor, verbose))
+    p.start()
+    p.join()
+
+    return workspaceNumElementsTensor.item() * dtype.itemsize

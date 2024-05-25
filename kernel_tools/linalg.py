@@ -39,7 +39,8 @@ def cusolver_eigh(
                   overwrite_a=overwrite_a, 
                   subset_by_index=subset_by_index, 
                   lower=lower, 
-                  eigvals_only=eigvals_only
+                  eigvals_only=eigvals_only,
+                  verbose=verbose
             )
 
 def cusolver_eigh_workspace_requirements(N, dtype):
@@ -93,7 +94,7 @@ def cusolver_mg_eigh_workspace_requirements(N, dtype, num_devices=None, verbose=
     verbose: Print some stuff
     
     Returns:
-    workspaceElements: The number of elements of the dtype the workspace requires
+    workspaceInBytesDevice
     """
 
     return mgSyevd_workspace_query(N, num_devices, dtype, verbose)

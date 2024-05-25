@@ -53,45 +53,18 @@
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #include <cuda_runtime.h>
+#include <cuda.h>
 #include <cusolverMg.h>
 
 #include "cusolverMg_utils.h"
 #include "cusolver_utils.h"
 
 #include "kernel_tools.h"
-
-// Class to manage the cuBLAS handle
-class CuSolverMgHandle {
-public:
-    CuSolverMgHandle() {
-        cusolverStatus_t status = cusolverMgCreate(&handle);
-        if (status != CUSOLVER_STATUS_SUCCESS) {
-            throw std::runtime_error("Failed to create cuSolver handle");
-        }
-    }
-
-    ~CuSolverMgHandle() {
-        cusolverStatus_t status = cusolverMgDestroy(handle);
-        if (status != CUSOLVER_STATUS_SUCCESS) {
-            std::cerr << "Failed to destroy cuSolver handle" << std::endl;
-        }
-    }
-
-    cusolverMgHandle_t get() const {
-        return handle;
-    }
-
-private:
-    cusolverMgHandle_t handle;
-};
-
-// Singleton pattern to ensure only one instance of CuSolverMgHandle
-CuSolverMgHandle& get_cusolver_mg_handle() {
-    static CuSolverMgHandle handle;
-    return handle;
-}
 
 template <typename T>
 void cusolverMgSyevd_workspace_template(
@@ -102,8 +75,6 @@ void cusolverMgSyevd_workspace_template(
     bool verbose
 ) {
     using data_type = T;
-
-    cusolverMgHandle_t cusolverH = get_cusolver_mg_handle().get();
 
     const int MAX_NUM_DEVICES = 16;
 
@@ -136,7 +107,9 @@ void cusolverMgSyevd_workspace_template(
         }
     }
 
-    CUSOLVER_CHECK( cusolverMgDeviceSelect(cusolverH, nbGpus, deviceList.data()) );
+    cusolverMgHandle_t cusolver_mg_handle = NULL;
+    CUSOLVER_CHECK( cusolverMgCreate(&cusolver_mg_handle) );
+    CUSOLVER_CHECK( cusolverMgDeviceSelect(cusolver_mg_handle, nbGpus, deviceList.data()) );
     CUSOLVER_CHECK( cusolverMgCreateDeviceGrid(&gridA, 1, nbGpus, deviceList.data(), mapping) );
 
     /* (global) A is N-by-N */
@@ -154,7 +127,7 @@ void cusolverMgSyevd_workspace_template(
 
     CUSOLVER_CHECK( 
         cusolverMgSyevd_bufferSize(
-            cusolverH, 
+            cusolver_mg_handle, 
             jobz, 
             CUBLAS_FILL_MODE_LOWER, /* only support lower mode */
             N, 
@@ -172,13 +145,10 @@ void cusolverMgSyevd_workspace_template(
     if (verbose) std::printf("\tAllocate device workspace, lwork = %lld \n", static_cast<long long>(lwork));
     *workspace_elements = lwork;
 
-    if (descrA != NULL) {
-        CUSOLVER_CHECK( cusolverMgDestroyMatrixDesc(descrA) );
-    }
+    if (descrA != NULL) CUSOLVER_CHECK( cusolverMgDestroyMatrixDesc(descrA) );
+    if (gridA != NULL) CUSOLVER_CHECK( cusolverMgDestroyGrid(gridA) );
 
-    if (gridA != NULL) {
-        CUSOLVER_CHECK( cusolverMgDestroyGrid(gridA) );
-    }
+    CUSOLVER_CHECK( cusolverMgDestroy(cusolver_mg_handle) );
 }
 
 template <typename T>
@@ -188,14 +158,7 @@ void cusolverMgSyevd_template(
     int max_devices,
     bool verbose
 ) {
-
-    size_t start_free_mem, end_free_mem, total_mem;
-    CUDA_CHECK( cudaMemGetInfo(&start_free_mem, &total_mem) );
-    if (verbose) printf("start: %zu\n", start_free_mem);
-
     using data_type = T;
-
-    cusolverMgHandle_t cusolverH = get_cusolver_mg_handle().get();
 
     /* maximum number of GPUs */
     const int MAX_NUM_DEVICES = max_devices;
@@ -219,8 +182,13 @@ void cusolverMgSyevd_template(
 
     int64_t lwork = 0; /* workspace: number of elements per device */
 
+    CUDA_CHECK( cudaSetDevice(0) );
+    cusolverMgHandle_t cusolver_mg_handle = NULL;
+    CUSOLVER_CHECK( cusolverMgCreate(&cusolver_mg_handle) );
+
     if (verbose) std::printf("Step 1: Create Mg handle and select devices \n");
     CUDA_CHECK( cudaGetDeviceCount(&nbGpus) );
+    CUDA_CHECK( cudaDeviceSynchronize() );
 
     nbGpus = (nbGpus < MAX_NUM_DEVICES) ? nbGpus : MAX_NUM_DEVICES;
     if (verbose) std::printf("\tThere are %d GPUs \n", nbGpus);
@@ -231,7 +199,7 @@ void cusolverMgSyevd_template(
         if (verbose) std::printf("\tDevice %d, %s, cc %d.%d \n", j, prop.name, prop.major, prop.minor);
     } 
 
-    CUSOLVER_CHECK( cusolverMgDeviceSelect(cusolverH, nbGpus, deviceList.data()) );
+    CUSOLVER_CHECK( cusolverMgDeviceSelect(cusolver_mg_handle, nbGpus, deviceList.data()) );
 
     if (verbose) std::printf("step 2: Enable peer access.\n");
     CUDA_CHECK( enablePeerAccess(nbGpus, deviceList.data()) );
@@ -254,7 +222,7 @@ void cusolverMgSyevd_template(
     if (verbose) std::printf("Step 8: Allocate workspace space \n");
     CUSOLVER_CHECK( 
         cusolverMgSyevd_bufferSize(
-            cusolverH, 
+            cusolver_mg_handle, 
             jobz, 
             CUBLAS_FILL_MODE_LOWER, /* only support lower mode */
             N, 
@@ -270,7 +238,6 @@ void cusolverMgSyevd_template(
     );
 
     if (verbose) std::printf("\tAllocate device workspace, lwork = %lld \n", static_cast<long long>(lwork));
-
     if (verbose) std::printf("Step 6: Allocate distributed matrices A and D \n");
     std::vector<data_type *> array_d_A(nbGpus, nullptr);
     data_type *a_data = a.data_ptr<data_type>();
@@ -326,7 +293,7 @@ void cusolverMgSyevd_template(
         if (verbose) std::printf("Step 9: Compute eigenvalues and eigenvectors \n");
         cuda_solver_status = 
             cusolverMgSyevd(
-                cusolverH, 
+                cusolver_mg_handle, 
                 jobz, 
                 CUBLAS_FILL_MODE_LOWER, /* only support lower mode */
                 N, 
@@ -368,31 +335,28 @@ void cusolverMgSyevd_template(
         if (cuda_status != cudaSuccess) break;
     } while(0);
 
-    cudaError_t destroyMat_status;
-    cudaError_t workspaceFree_status;
-
     if (verbose) std::printf("step 12: Free resources \n");
-    destroyMat_status = 
+    CUDA_CHECK( 
         destroyMat(
             nbGpus, 
             deviceList.data(), 
             N,   /* number of columns of global A */
             T_A, /* number of columns per column tile */
             reinterpret_cast<void **>(array_d_A.data())
-        );
+        )
+    );
 
-    workspaceFree_status = workspaceFree(nbGpus, deviceList.data(), reinterpret_cast<void **>(array_d_work.data()));
+    CUDA_CHECK( 
+        workspaceFree(
+            nbGpus, 
+            deviceList.data(), 
+            reinterpret_cast<void **>(array_d_work.data())
+        ) 
+    );
 
-    CUDA_CHECK(destroyMat_status);
-    CUDA_CHECK(workspaceFree_status);
-
-    if (descrA != NULL) {
-        CUSOLVER_CHECK( cusolverMgDestroyMatrixDesc(descrA) );
-    }
-
-    if (gridA != NULL) {
-        CUSOLVER_CHECK( cusolverMgDestroyGrid(gridA) );
-    }
+    if (descrA != NULL) CUSOLVER_CHECK( cusolverMgDestroyMatrixDesc(descrA) );
+    if (gridA != NULL) CUSOLVER_CHECK( cusolverMgDestroyGrid(gridA) );
+    CUSOLVER_CHECK( cusolverMgDestroy(cusolver_mg_handle) );
 
     if (0 > info) {
         char buffer[100];
@@ -402,11 +366,6 @@ void cusolverMgSyevd_template(
 
     CUDA_CHECK(cuda_status);
     CUSOLVER_CHECK(cuda_solver_status);
-
-    CUDA_CHECK( cudaMemGetInfo(&end_free_mem, &total_mem) );
-    if (verbose) printf("end: %zu\n", end_free_mem);
-    if (verbose) printf("difference: %zu\n", end_free_mem - start_free_mem);
-    if (verbose) printf("difference: %zu\n", start_free_mem - end_free_mem);
 }
 
 static void signal_handler(int signum) {
@@ -433,14 +392,24 @@ void cusolverMgSyevd_export(
     if (a.size(0) != a.size(1)) 
         throw std::runtime_error("Matrix needs to be square");
 
-    if (a.dtype() == torch::kFloat32) 
-        return cusolverMgSyevd_template<float>(a, d, max_devices, verbose);
+    // Need to do this because there is a bug in cusolverMg handle creation/destruction. Pending fix...
+    // This shouldn't leak memory even with bug. I ran this 2000 times in a row watching vram usage.
+    // pid_t pid = fork();
+    // if (pid == 0) { // This is the child process
+    if (a.dtype() != torch::kFloat32 && a.dtype() != torch::kFloat64) {
+        throw std::runtime_error("Tensor needs to have dtype either float32 or float64");
+    }
 
-    if (a.dtype() == torch::kFloat64) 
-        return cusolverMgSyevd_template<double>(a, d, max_devices, verbose);
-
-    // If it gets here the dtype isn't supported
-    throw std::runtime_error("Tensor needs to have dtype either float32 or float64");
+    if (a.dtype() == torch::kFloat32) {
+        cusolverMgSyevd_template<float>(a, d, max_devices, verbose);
+    } else {
+        cusolverMgSyevd_template<double>(a, d, max_devices, verbose);
+    }
+    //     _exit(0); // Exit child process
+    // } else {
+    //     int status;
+    //     waitpid(pid, &status, 0);
+    // }
 }
 
 void cusolverMgSyevd_workspace_query_export(
@@ -462,10 +431,19 @@ void cusolverMgSyevd_workspace_query_export(
     }
 
     int64_t num_workspace_elements;
+
+    // Need to do this because there is a bug in cusolverMg handle creation/destruction. Pending fix...
+    // pid_t pid = fork();
+    // if (pid == 0) { // This is the child process
     if (is_fp32) {
         cusolverMgSyevd_workspace_template<float>(N, num_devices, use_num_devices_visible, &num_workspace_elements, verbose);
     } else {
         cusolverMgSyevd_workspace_template<double>(N, num_devices, use_num_devices_visible, &num_workspace_elements, verbose);
     }
     *workspace_num_elements.data_ptr<int64_t>() = num_workspace_elements;
+    //     _exit(0); // Exit child process
+    // } else {
+    //     int status;
+    //     waitpid(pid, &status, 0);
+    // }
 }
