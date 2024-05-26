@@ -17,7 +17,9 @@ eigenvalues/eigenvectors of a system. This function runs on one Nvidia device.
 
 This function is available in this library at `kernel_tools.linalg.cusolver_eigh`
 
-The function to estimate workspace size for a future run is `kernel_tools.linalg.cusolver_eigh_workspace_requirements`
+The function to estimate workspace size for a future run is `kernel_tools.linalg.cusolver_eigh_workspace_requirements`.
+
+The workspace does not include the memory necessary to store the matrix.
 
 ### cusolverMgsyevd
 
@@ -27,6 +29,8 @@ visible Nvidia devices to split the work and share data across NVlink if availab
 This function is available in this library at `kernel_tools.linalg.cusolver_mg_eigh`
 
 The function to estimate workspace size for a future run is `kernel_tools.linalg.cusolver_mg_eigh_workspace_requirements`
+
+The workspace is split between all of the devices, so as you add more devices keeping the N static, the workspace requirement per device goes down. This workspace does not include the memory necessary to store the matrix.
 
 ### Performance
 
