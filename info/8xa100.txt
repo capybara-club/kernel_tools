@@ -102,29 +102,29 @@ N:35000, num_eigs:35000, dtype:torch.float64, run_time:41.40771508216858, device
 N:40000, num_eigs:40000, dtype:torch.float64, run_time:54.05128717422485, device:4xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:10509569536
 N:45000, num_eigs:45000, dtype:torch.float64, run_time:70.47244048118591, device:4xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:13002978048
 N:50000, num_eigs:50000, dtype:torch.float64, run_time:88.54587721824646, device:4xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:16410946048
-N:100, num_eigs:100, dtype:torch.float32, run_time:5.377092599868774, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:20166016
-N:1000, num_eigs:1000, dtype:torch.float32, run_time:5.664005994796753, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:34266752
-N:2000, num_eigs:2000, dtype:torch.float32, run_time:6.109216928482056, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:49917696
-N:5000, num_eigs:5000, dtype:torch.float32, run_time:7.334689140319824, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:174966016
-N:10000, num_eigs:10000, dtype:torch.float32, run_time:8.899527072906494, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:2559540608
-N:15000, num_eigs:15000, dtype:torch.float32, run_time:12.295985221862793, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:2756157824
-N:20000, num_eigs:20000, dtype:torch.float32, run_time:16.59710717201233, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:3018307968
-N:25000, num_eigs:25000, dtype:torch.float32, run_time:21.567090272903442, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:3509837184
-N:30000, num_eigs:30000, dtype:torch.float32, run_time:27.76233744621277, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:3935827328
-N:35000, num_eigs:35000, dtype:torch.float32, run_time:35.00472927093506, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:4926141312
-N:40000, num_eigs:40000, dtype:torch.float32, run_time:43.69218301773071, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:6249455104
-N:45000, num_eigs:45000, dtype:torch.float32, run_time:53.34267258644104, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:7729934720
-N:50000, num_eigs:50000, dtype:torch.float32, run_time:64.3023133277893, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:10142868608
-N:100, num_eigs:100, dtype:torch.float64, run_time:5.608382225036621, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:19923456
-N:1000, num_eigs:1000, dtype:torch.float64, run_time:5.927316188812256, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:31812352
-N:2000, num_eigs:2000, dtype:torch.float64, run_time:6.386232614517212, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:45005568
-N:5000, num_eigs:5000, dtype:torch.float64, run_time:7.825856924057007, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:150399232
-N:10000, num_eigs:10000, dtype:torch.float64, run_time:9.996926069259644, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:2485828096
-N:15000, num_eigs:15000, dtype:torch.float64, run_time:13.706153869628906, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:2608726528
-N:20000, num_eigs:20000, dtype:torch.float64, run_time:18.9057834148407, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:2772578816
-N:25000, num_eigs:25000, dtype:torch.float64, run_time:24.038617372512817, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:3079797248
-N:30000, num_eigs:30000, dtype:torch.float64, run_time:31.688546419143677, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:3346049536
-N:35000, num_eigs:35000, dtype:torch.float64, run_time:40.42782759666443, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:4152052736
-N:40000, num_eigs:40000, dtype:torch.float64, run_time:50.474379777908325, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:5266476544
-N:45000, num_eigs:45000, dtype:torch.float64, run_time:62.128045082092285, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:6513490432
-N:50000, num_eigs:50000, dtype:torch.float64, run_time:76.99885821342468, device:A100-SXM4-80GB, 8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:8545505536
+N:100, num_eigs:100, dtype:torch.float32, run_time:5.377092599868774, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:20166016
+N:1000, num_eigs:1000, dtype:torch.float32, run_time:5.664005994796753, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:34266752
+N:2000, num_eigs:2000, dtype:torch.float32, run_time:6.109216928482056, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:49917696
+N:5000, num_eigs:5000, dtype:torch.float32, run_time:7.334689140319824, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:174966016
+N:10000, num_eigs:10000, dtype:torch.float32, run_time:8.899527072906494, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:2559540608
+N:15000, num_eigs:15000, dtype:torch.float32, run_time:12.295985221862793, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:2756157824
+N:20000, num_eigs:20000, dtype:torch.float32, run_time:16.59710717201233, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:3018307968
+N:25000, num_eigs:25000, dtype:torch.float32, run_time:21.567090272903442, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:3509837184
+N:30000, num_eigs:30000, dtype:torch.float32, run_time:27.76233744621277, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:3935827328
+N:35000, num_eigs:35000, dtype:torch.float32, run_time:35.00472927093506, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:4926141312
+N:40000, num_eigs:40000, dtype:torch.float32, run_time:43.69218301773071, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:6249455104
+N:45000, num_eigs:45000, dtype:torch.float32, run_time:53.34267258644104, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:7729934720
+N:50000, num_eigs:50000, dtype:torch.float32, run_time:64.3023133277893, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:10142868608
+N:100, num_eigs:100, dtype:torch.float64, run_time:5.608382225036621, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:19923456
+N:1000, num_eigs:1000, dtype:torch.float64, run_time:5.927316188812256, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:31812352
+N:2000, num_eigs:2000, dtype:torch.float64, run_time:6.386232614517212, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:45005568
+N:5000, num_eigs:5000, dtype:torch.float64, run_time:7.825856924057007, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:150399232
+N:10000, num_eigs:10000, dtype:torch.float64, run_time:9.996926069259644, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:2485828096
+N:15000, num_eigs:15000, dtype:torch.float64, run_time:13.706153869628906, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:2608726528
+N:20000, num_eigs:20000, dtype:torch.float64, run_time:18.9057834148407, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:2772578816
+N:25000, num_eigs:25000, dtype:torch.float64, run_time:24.038617372512817, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:3079797248
+N:30000, num_eigs:30000, dtype:torch.float64, run_time:31.688546419143677, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:3346049536
+N:35000, num_eigs:35000, dtype:torch.float64, run_time:40.42782759666443, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:4152052736
+N:40000, num_eigs:40000, dtype:torch.float64, run_time:50.474379777908325, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:5266476544
+N:45000, num_eigs:45000, dtype:torch.float64, run_time:62.128045082092285, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:6513490432
+N:50000, num_eigs:50000, dtype:torch.float64, run_time:76.99885821342468, device:8xA100-SXM4-80GB, method:cusolverMgsyevd, workspace_bytes:8545505536
