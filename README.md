@@ -23,8 +23,7 @@ The workspace does not include the memory necessary to store the matrix.
 
 ### cusolverMgsyevd
 
-This function extracts all eigenvalues/eigenvectors of a system. This function uses all
-visible Nvidia devices to split the work and share data across NVlink if available.
+This function extracts all eigenvalues/eigenvectors of a system. This function uses all visible Nvidia devices to split the work and share data across NVlink if available.
 
 This function is available in this library at `kernel_tools.linalg.cusolver_mg_eigh`
 
