@@ -28,6 +28,12 @@ This function is available in this library at `kernel_tools.linalg.cusolver_mg_e
 
 The function to estimate workspace size for a future run is `kernel_tools.linalg.cusolver_mg_eigh_workspace_requirements`
 
+### Performance
+
+![Performance including CPU methods](./images/evd_device_and_method.png)
+![Performance GPU methods only](./images/evd_device_and_method_gpu.png)
+![Workspace Requirements](./images/evd_workspace_requirement.png)
+
 #### WARNING:
 There is currently an issue with reusing the `cusolverMgHandle_t` for multiple runs in the same context. It seems that even destroying the handle and creating a new one has the same issue. The only single process workaround appears to be leaking memory by creating a new handle for each run and leaving the old ones stagnant. This library gets around the bug by spawning a new process with a fresh cuda context for each call in to a cusolverMgHandle_t. This doesn't appear to leak any memory, even with 2,000+ sequential small runs. A bug report was filed to Nvidia, waiting on followup.
 
