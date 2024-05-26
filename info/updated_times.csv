@@ -1,0 +1,313 @@
+N,Eigenvalues,Precision,Seconds,Device,Method,Workspace MB
+100,5,f32,0.02, A100-SXM4-80GB, cusolverSyevdx,0
+1000,50,f32,0.04, A100-SXM4-80GB, cusolverSyevdx,12
+2000,100,f32,0.05, A100-SXM4-80GB, cusolverSyevdx,48
+5000,250,f32,0.29, A100-SXM4-80GB, cusolverSyevdx,300
+10000,500,f32,1.5, A100-SXM4-80GB, cusolverSyevdx,1200
+15000,750,f32,4.01, A100-SXM4-80GB, cusolverSyevdx,2700
+20000,1000,f32,8.29, A100-SXM4-80GB, cusolverSyevdx,4801
+25000,1250,f32,14.87, A100-SXM4-80GB, cusolverSyevdx,7501
+30000,1500,f32,24.15, A100-SXM4-80GB, cusolverSyevdx,10801
+35000,1750,f32,36.59, A100-SXM4-80GB, cusolverSyevdx,14701
+40000,2000,f32,52.3, A100-SXM4-80GB, cusolverSyevdx,19202
+45000,2250,f32,73.68, A100-SXM4-80GB, cusolverSyevdx,24302
+50000,2500,f32,98.86, A100-SXM4-80GB, cusolverSyevdx,30002
+100,5,f64,0.01, A100-SXM4-80GB, cusolverSyevdx,0
+1000,50,f64,0.03, A100-SXM4-80GB, cusolverSyevdx,24
+2000,100,f64,0.04, A100-SXM4-80GB, cusolverSyevdx,96
+5000,250,f64,0.42, A100-SXM4-80GB, cusolverSyevdx,600
+10000,500,f64,2.41, A100-SXM4-80GB, cusolverSyevdx,2400
+15000,750,f64,6.73, A100-SXM4-80GB, cusolverSyevdx,5401
+20000,1000,f64,14.8, A100-SXM4-80GB, cusolverSyevdx,9601
+25000,1250,f64,27.48, A100-SXM4-80GB, cusolverSyevdx,15001
+30000,1500,f64,45.27, A100-SXM4-80GB, cusolverSyevdx,21602
+35000,1750,f64,72.29, A100-SXM4-80GB, cusolverSyevdx,29402
+40000,2000,f64,102.74, A100-SXM4-80GB, cusolverSyevdx,38403
+45000,2250,f64,146.17, A100-SXM4-80GB, cusolverSyevdx,48603
+50000,2500,f64,196.56, A100-SXM4-80GB, cusolverSyevdx,60003
+100,100,f32,2.81, A100-SXM4-80GB, cusolverMgsyevd,20
+1000,1000,f32,2.95, A100-SXM4-80GB, cusolverMgsyevd,49
+2000,2000,f32,3.15, A100-SXM4-80GB, cusolverMgsyevd,143
+5000,5000,f32,4.02, A100-SXM4-80GB, cusolverMgsyevd,798
+10000,10000,f32,6.14, A100-SXM4-80GB, cusolverMgsyevd,3673
+15000,15000,f32,10.12, A100-SXM4-80GB, cusolverMgsyevd,7025
+20000,20000,f32,16.72, A100-SXM4-80GB, cusolverMgsyevd,12473
+25000,25000,f32,26.34, A100-SXM4-80GB, cusolverMgsyevd,19094
+30000,30000,f32,40.36, A100-SXM4-80GB, cusolverMgsyevd,27576
+35000,35000,f32,59.08, A100-SXM4-80GB, cusolverMgsyevd,37615
+40000,40000,f32,82.67, A100-SXM4-80GB, cusolverMgsyevd,49209
+45000,45000,f32,113.54, A100-SXM4-80GB, cusolverMgsyevd,61671
+50000,50000,f32,, A100-SXM4-80GB, cusolverMgsyevd,76300
+100,100,f64,3.01, A100-SXM4-80GB, cusolverMgsyevd,19
+1000,1000,f64,3.15, A100-SXM4-80GB, cusolverMgsyevd,45
+2000,2000,f64,3.35, A100-SXM4-80GB, cusolverMgsyevd,123
+5000,5000,f64,4.4, A100-SXM4-80GB, cusolverMgsyevd,675
+10000,10000,f64,7.03, A100-SXM4-80GB, cusolverMgsyevd,3182
+15000,15000,f64,12.59, A100-SXM4-80GB, cusolverMgsyevd,5920
+20000,20000,f64,22.17, A100-SXM4-80GB, cusolverMgsyevd,10507
+25000,25000,f64,35.77, A100-SXM4-80GB, cusolverMgsyevd,16084
+30000,30000,f64,55.64, A100-SXM4-80GB, cusolverMgsyevd,23227
+35000,35000,f64,82.73, A100-SXM4-80GB, cusolverMgsyevd,31680
+40000,40000,f64,115.88, A100-SXM4-80GB, cusolverMgsyevd,41443
+45000,45000,f64,160.69, A100-SXM4-80GB, cusolverMgsyevd,51939
+50000,50000,f64,, A100-SXM4-80GB, cusolverMgsyevd,64259
+100,100,f32,3.13, 2xA100-SXM4-80GB, cusolverMgsyevd,20
+1000,1000,f32,3.35, 2xA100-SXM4-80GB, cusolverMgsyevd,34
+2000,2000,f32,3.58, 2xA100-SXM4-80GB, cusolverMgsyevd,81
+5000,5000,f32,4.45, 2xA100-SXM4-80GB, cusolverMgsyevd,408
+10000,10000,f32,6.36, 2xA100-SXM4-80GB, cusolverMgsyevd,3018
+15000,15000,f32,9.97, 2xA100-SXM4-80GB, cusolverMgsyevd,3837
+20000,20000,f32,14.83, 2xA100-SXM4-80GB, cusolverMgsyevd,6247
+25000,25000,f32,21.43, 2xA100-SXM4-80GB, cusolverMgsyevd,9752
+30000,30000,f32,29.77, 2xA100-SXM4-80GB, cusolverMgsyevd,14033
+35000,35000,f32,40.82, 2xA100-SXM4-80GB, cusolverMgsyevd,19091
+40000,40000,f32,54.29, 2xA100-SXM4-80GB, cusolverMgsyevd,24927
+45000,45000,f32,71.82, 2xA100-SXM4-80GB, cusolverMgsyevd,30847
+50000,50000,f32,92.52, 2xA100-SXM4-80GB, cusolverMgsyevd,38162
+100,100,f64,3.13, 2xA100-SXM4-80GB, cusolverMgsyevd,19
+1000,1000,f64,3.32, 2xA100-SXM4-80GB, cusolverMgsyevd,31
+2000,2000,f64,3.59, 2xA100-SXM4-80GB, cusolverMgsyevd,71
+5000,5000,f64,4.62, 2xA100-SXM4-80GB, cusolverMgsyevd,347
+10000,10000,f64,6.88, 2xA100-SXM4-80GB, cusolverMgsyevd,2772
+15000,15000,f64,10.78, 2xA100-SXM4-80GB, cusolverMgsyevd,3284
+20000,20000,f64,17.11, 2xA100-SXM4-80GB, cusolverMgsyevd,5264
+25000,25000,f64,26.12, 2xA100-SXM4-80GB, cusolverMgsyevd,8216
+30000,30000,f64,38.16, 2xA100-SXM4-80GB, cusolverMgsyevd,11821
+35000,35000,f64,54.23, 2xA100-SXM4-80GB, cusolverMgsyevd,16081
+40000,40000,f64,73.75, 2xA100-SXM4-80GB, cusolverMgsyevd,20995
+45000,45000,f64,100.66, 2xA100-SXM4-80GB, cusolverMgsyevd,25981
+50000,50000,f64,130.65, 2xA100-SXM4-80GB, cusolverMgsyevd,32141
+100,100,f32,3.79, 4xA100-SXM4-80GB, cusolverMgsyevd,20
+1000,1000,f32,4.05, 4xA100-SXM4-80GB, cusolverMgsyevd,34
+2000,2000,f32,4.35, 4xA100-SXM4-80GB, cusolverMgsyevd,49
+5000,5000,f32,5.25, 4xA100-SXM4-80GB, cusolverMgsyevd,252
+10000,10000,f32,6.97, 4xA100-SXM4-80GB, cusolverMgsyevd,2690
+15000,15000,f32,10.53, 4xA100-SXM4-80GB, cusolverMgsyevd,3149
+20000,20000,f32,14.86, 4xA100-SXM4-80GB, cusolverMgsyevd,3673
+25000,25000,f32,20.19, 4xA100-SXM4-80GB, cusolverMgsyevd,5081
+30000,30000,f32,26.74, 4xA100-SXM4-80GB, cusolverMgsyevd,7027
+35000,35000,f32,35.99, 4xA100-SXM4-80GB, cusolverMgsyevd,9829
+40000,40000,f32,46.2, 4xA100-SXM4-80GB, cusolverMgsyevd,12475
+45000,45000,f32,57.92, 4xA100-SXM4-80GB, cusolverMgsyevd,15435
+50000,50000,f32,71.45, 4xA100-SXM4-80GB, cusolverMgsyevd,19482
+100,100,f64,4.02, 4xA100-SXM4-80GB, cusolverMgsyevd,19
+1000,1000,f64,4.25, 4xA100-SXM4-80GB, cusolverMgsyevd,31
+2000,2000,f64,4.58, 4xA100-SXM4-80GB, cusolverMgsyevd,45
+5000,5000,f64,5.67, 4xA100-SXM4-80GB, cusolverMgsyevd,216
+10000,10000,f64,7.78, 4xA100-SXM4-80GB, cusolverMgsyevd,2567
+15000,15000,f64,11.24, 4xA100-SXM4-80GB, cusolverMgsyevd,2854
+20000,20000,f64,16.02, 4xA100-SXM4-80GB, cusolverMgsyevd,3182
+25000,25000,f64,22.47, 4xA100-SXM4-80GB, cusolverMgsyevd,4283
+30000,30000,f64,30.78, 4xA100-SXM4-80GB, cusolverMgsyevd,5921
+35000,35000,f64,41.41, 4xA100-SXM4-80GB, cusolverMgsyevd,8281
+40000,40000,f64,54.05, 4xA100-SXM4-80GB, cusolverMgsyevd,10509
+45000,45000,f64,70.47, 4xA100-SXM4-80GB, cusolverMgsyevd,13002
+50000,50000,f64,88.55, 4xA100-SXM4-80GB, cusolverMgsyevd,16410
+100,100,f32,5.38, 8xA100-SXM4-80GB, cusolverMgsyevd,20
+1000,1000,f32,5.66, 8xA100-SXM4-80GB, cusolverMgsyevd,34
+2000,2000,f32,6.11, 8xA100-SXM4-80GB, cusolverMgsyevd,49
+5000,5000,f32,7.33, 8xA100-SXM4-80GB, cusolverMgsyevd,174
+10000,10000,f32,8.9, 8xA100-SXM4-80GB, cusolverMgsyevd,2559
+15000,15000,f32,12.3, 8xA100-SXM4-80GB, cusolverMgsyevd,2756
+20000,20000,f32,16.6, 8xA100-SXM4-80GB, cusolverMgsyevd,3018
+25000,25000,f32,21.57, 8xA100-SXM4-80GB, cusolverMgsyevd,3509
+30000,30000,f32,27.76, 8xA100-SXM4-80GB, cusolverMgsyevd,3935
+35000,35000,f32,35.0, 8xA100-SXM4-80GB, cusolverMgsyevd,4926
+40000,40000,f32,43.69, 8xA100-SXM4-80GB, cusolverMgsyevd,6249
+45000,45000,f32,53.34, 8xA100-SXM4-80GB, cusolverMgsyevd,7729
+50000,50000,f32,64.3, 8xA100-SXM4-80GB, cusolverMgsyevd,10142
+100,100,f64,5.61, 8xA100-SXM4-80GB, cusolverMgsyevd,19
+1000,1000,f64,5.93, 8xA100-SXM4-80GB, cusolverMgsyevd,31
+2000,2000,f64,6.39, 8xA100-SXM4-80GB, cusolverMgsyevd,45
+5000,5000,f64,7.83, 8xA100-SXM4-80GB, cusolverMgsyevd,150
+10000,10000,f64,10.0, 8xA100-SXM4-80GB, cusolverMgsyevd,2485
+15000,15000,f64,13.71, 8xA100-SXM4-80GB, cusolverMgsyevd,2608
+20000,20000,f64,18.91, 8xA100-SXM4-80GB, cusolverMgsyevd,2772
+25000,25000,f64,24.04, 8xA100-SXM4-80GB, cusolverMgsyevd,3079
+30000,30000,f64,31.69, 8xA100-SXM4-80GB, cusolverMgsyevd,3346
+35000,35000,f64,40.43, 8xA100-SXM4-80GB, cusolverMgsyevd,4152
+40000,40000,f64,50.47, 8xA100-SXM4-80GB, cusolverMgsyevd,5266
+45000,45000,f64,62.13, 8xA100-SXM4-80GB, cusolverMgsyevd,6513
+50000,50000,f64,77.0, 8xA100-SXM4-80GB, cusolverMgsyevd,8545
+100,5,f32,0.02, RTX-3070-8GB, cusolverSyevdx,0
+1000,50,f32,0.04, RTX-3070-8GB, cusolverSyevdx,12
+2000,100,f32,0.07, RTX-3070-8GB, cusolverSyevdx,48
+5000,250,f32,0.45, RTX-3070-8GB, cusolverSyevdx,300
+10000,500,f32,2.32, RTX-3070-8GB, cusolverSyevdx,1200
+15000,750,f32,6.2, RTX-3070-8GB, cusolverSyevdx,2700
+20000,1000,f32,14.5, RTX-3070-8GB, cusolverSyevdx,4801
+25000,1250,f32,, RTX-3070-8GB, cusolverSyevdx,7501
+30000,1500,f32,, RTX-3070-8GB, cusolverSyevdx,10801
+35000,1750,f32,, RTX-3070-8GB, cusolverSyevdx,14701
+40000,2000,f32,, RTX-3070-8GB, cusolverSyevdx,19202
+45000,2250,f32,, RTX-3070-8GB, cusolverSyevdx,24302
+50000,2500,f32,, RTX-3070-8GB, cusolverSyevdx,30002
+100,5,f64,0.01, RTX-3070-8GB, cusolverSyevdx,0
+1000,50,f64,0.05, RTX-3070-8GB, cusolverSyevdx,24
+2000,100,f64,0.16, RTX-3070-8GB, cusolverSyevdx,96
+5000,250,f64,1.81, RTX-3070-8GB, cusolverSyevdx,600
+10000,500,f64,11.33, RTX-3070-8GB, cusolverSyevdx,2400
+15000,750,f64,28.87, RTX-3070-8GB, cusolverSyevdx,5401
+20000,1000,f64,, RTX-3070-8GB, cusolverSyevdx,9601
+25000,1250,f64,, RTX-3070-8GB, cusolverSyevdx,15001
+30000,1500,f64,, RTX-3070-8GB, cusolverSyevdx,21602
+35000,1750,f64,, RTX-3070-8GB, cusolverSyevdx,29402
+40000,2000,f64,, RTX-3070-8GB, cusolverSyevdx,38403
+45000,2250,f64,, RTX-3070-8GB, cusolverSyevdx,48603
+50000,2500,f64,, RTX-3070-8GB, cusolverSyevdx,60003
+100,100,f32,1.72, RTX-3070-8GB, cusolverMgsyevd,20
+1000,1000,f32,1.86, RTX-3070-8GB, cusolverMgsyevd,49
+2000,2000,f32,2.06, RTX-3070-8GB, cusolverMgsyevd,143
+5000,5000,f32,3.15, RTX-3070-8GB, cusolverMgsyevd,798
+10000,10000,f32,7.62, RTX-3070-8GB, cusolverMgsyevd,3673
+15000,15000,f32,, RTX-3070-8GB, cusolverMgsyevd,7025
+20000,20000,f32,, RTX-3070-8GB, cusolverMgsyevd,12473
+25000,25000,f32,, RTX-3070-8GB, cusolverMgsyevd,19094
+30000,30000,f32,, RTX-3070-8GB, cusolverMgsyevd,27576
+35000,35000,f32,, RTX-3070-8GB, cusolverMgsyevd,37615
+40000,40000,f32,, RTX-3070-8GB, cusolverMgsyevd,49209
+45000,45000,f32,, RTX-3070-8GB, cusolverMgsyevd,61671
+50000,50000,f32,, RTX-3070-8GB, cusolverMgsyevd,76300
+100,100,f64,1.72, RTX-3070-8GB, cusolverMgsyevd,19
+1000,1000,f64,1.91, RTX-3070-8GB, cusolverMgsyevd,45
+2000,2000,f64,2.25, RTX-3070-8GB, cusolverMgsyevd,123
+5000,5000,f64,4.91, RTX-3070-8GB, cusolverMgsyevd,675
+10000,10000,f64,19.01, RTX-3070-8GB, cusolverMgsyevd,3182
+15000,15000,f64,, RTX-3070-8GB, cusolverMgsyevd,5920
+20000,20000,f64,, RTX-3070-8GB, cusolverMgsyevd,10507
+25000,25000,f64,, RTX-3070-8GB, cusolverMgsyevd,16084
+30000,30000,f64,, RTX-3070-8GB, cusolverMgsyevd,23227
+35000,35000,f64,, RTX-3070-8GB, cusolverMgsyevd,31680
+40000,40000,f64,, RTX-3070-8GB, cusolverMgsyevd,41443
+45000,45000,f64,, RTX-3070-8GB, cusolverMgsyevd,51939
+50000,50000,f64,, RTX-3070-8GB, cusolverMgsyevd,64259
+100,100,f32,1.86, 2xRTX-3070-8GB, cusolverMgsyevd,20
+1000,1000,f32,2.04, 2xRTX-3070-8GB, cusolverMgsyevd,34
+2000,2000,f32,2.29, 2xRTX-3070-8GB, cusolverMgsyevd,81
+5000,5000,f32,3.41, 2xRTX-3070-8GB, cusolverMgsyevd,408
+10000,10000,f32,6.63, 2xRTX-3070-8GB, cusolverMgsyevd,3018
+15000,15000,f32,14.85, 2xRTX-3070-8GB, cusolverMgsyevd,3837
+20000,20000,f32,27.51, 2xRTX-3070-8GB, cusolverMgsyevd,6247
+25000,25000,f32,, 2xRTX-3070-8GB, cusolverMgsyevd,9752
+30000,30000,f32,, 2xRTX-3070-8GB, cusolverMgsyevd,14033
+35000,35000,f32,, 2xRTX-3070-8GB, cusolverMgsyevd,19091
+40000,40000,f32,, 2xRTX-3070-8GB, cusolverMgsyevd,24927
+45000,45000,f32,, 2xRTX-3070-8GB, cusolverMgsyevd,30847
+50000,50000,f32,, 2xRTX-3070-8GB, cusolverMgsyevd,38162
+100,100,f64,1.86, 2xRTX-3070-8GB, cusolverMgsyevd,19
+1000,1000,f64,2.06, 2xRTX-3070-8GB, cusolverMgsyevd,31
+2000,2000,f64,2.44, 2xRTX-3070-8GB, cusolverMgsyevd,71
+5000,5000,f64,4.61, 2xRTX-3070-8GB, cusolverMgsyevd,347
+10000,10000,f64,13.91, 2xRTX-3070-8GB, cusolverMgsyevd,2772
+15000,15000,f64,36.81, 2xRTX-3070-8GB, cusolverMgsyevd,3284
+20000,20000,f64,75.5, 2xRTX-3070-8GB, cusolverMgsyevd,5264
+25000,25000,f64,, 2xRTX-3070-8GB, cusolverMgsyevd,8216
+30000,30000,f64,, 2xRTX-3070-8GB, cusolverMgsyevd,11821
+35000,35000,f64,, 2xRTX-3070-8GB, cusolverMgsyevd,16081
+40000,40000,f64,, 2xRTX-3070-8GB, cusolverMgsyevd,20995
+45000,45000,f64,, 2xRTX-3070-8GB, cusolverMgsyevd,25981
+50000,50000,f64,, 2xRTX-3070-8GB, cusolverMgsyevd,32141
+100,5,f32,0.0, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+1000,50,f32,0.11, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+2000,100,f32,0.16, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+5000,250,f32,0.98, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+10000,500,f32,8.79, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+15000,750,f32,50.27, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+20000,1000,f32,122.14, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+25000,1250,f32,235.34, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+30000,1500,f32,399.93, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+35000,1750,f32,624.09, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+40000,2000,f32,, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+45000,2250,f32,, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+50000,2500,f32,, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+100,5,f64,0.0, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+1000,50,f64,0.07, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+2000,100,f64,0.34, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+5000,250,f64,1.9, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+10000,500,f64,25.05, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+15000,750,f64,93.26, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+20000,1000,f64,211.61, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+25000,1250,f64,399.44, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+30000,1500,f64,670.21, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+35000,1750,f64,1041.8, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+40000,2000,f64,, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+45000,2250,f64,, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+50000,2500,f64,, Threadripper 3960X 24-Core, scipy.linalg.eigh,0
+100,5,f32,0.01, RTX-4090-24GB, cusolverSyevdx,0
+1000,50,f32,0.02, RTX-4090-24GB, cusolverSyevdx,12
+2000,100,f32,0.02, RTX-4090-24GB, cusolverSyevdx,48
+5000,250,f32,0.13, RTX-4090-24GB, cusolverSyevdx,300
+10000,500,f32,1.1, RTX-4090-24GB, cusolverSyevdx,1200
+15000,750,f32,3.49, RTX-4090-24GB, cusolverSyevdx,2700
+20000,1000,f32,8.04, RTX-4090-24GB, cusolverSyevdx,4801
+25000,1250,f32,15.53, RTX-4090-24GB, cusolverSyevdx,7501
+30000,1500,f32,26.0, RTX-4090-24GB, cusolverSyevdx,10801
+35000,1750,f32,41.13, RTX-4090-24GB, cusolverSyevdx,14701
+40000,2000,f32,, RTX-4090-24GB, cusolverSyevdx,19202
+45000,2250,f32,, RTX-4090-24GB, cusolverSyevdx,24302
+50000,2500,f32,, RTX-4090-24GB, cusolverSyevdx,30002
+100,5,f64,0.01, RTX-4090-24GB, cusolverSyevdx,0
+1000,50,f64,0.03, RTX-4090-24GB, cusolverSyevdx,24
+2000,100,f64,0.06, RTX-4090-24GB, cusolverSyevdx,96
+5000,250,f64,0.66, RTX-4090-24GB, cusolverSyevdx,600
+10000,500,f64,4.14, RTX-4090-24GB, cusolverSyevdx,2400
+15000,750,f64,11.05, RTX-4090-24GB, cusolverSyevdx,5401
+20000,1000,f64,29.12, RTX-4090-24GB, cusolverSyevdx,9601
+25000,1250,f64,52.18, RTX-4090-24GB, cusolverSyevdx,15001
+30000,1500,f64,, RTX-4090-24GB, cusolverSyevdx,21602
+35000,1750,f64,, RTX-4090-24GB, cusolverSyevdx,29402
+40000,2000,f64,, RTX-4090-24GB, cusolverSyevdx,38403
+45000,2250,f64,, RTX-4090-24GB, cusolverSyevdx,48603
+50000,2500,f64,, RTX-4090-24GB, cusolverSyevdx,60003
+100,100,f32,1.03, RTX-4090-24GB, cusolverMgsyevd,20
+1000,1000,f32,1.12, RTX-4090-24GB, cusolverMgsyevd,49
+2000,2000,f32,1.24, RTX-4090-24GB, cusolverMgsyevd,143
+5000,5000,f32,1.76, RTX-4090-24GB, cusolverMgsyevd,798
+10000,10000,f32,3.47, RTX-4090-24GB, cusolverMgsyevd,3673
+15000,15000,f32,7.95, RTX-4090-24GB, cusolverMgsyevd,7025
+20000,20000,f32,16.11, RTX-4090-24GB, cusolverMgsyevd,12473
+25000,25000,f32,29.35, RTX-4090-24GB, cusolverMgsyevd,19094
+30000,30000,f32,, RTX-4090-24GB, cusolverMgsyevd,27576
+35000,35000,f32,, RTX-4090-24GB, cusolverMgsyevd,37615
+40000,40000,f32,, RTX-4090-24GB, cusolverMgsyevd,49209
+45000,45000,f32,, RTX-4090-24GB, cusolverMgsyevd,61671
+50000,50000,f32,, RTX-4090-24GB, cusolverMgsyevd,76300
+100,100,f64,1.02, RTX-4090-24GB, cusolverMgsyevd,19
+1000,1000,f64,1.14, RTX-4090-24GB, cusolverMgsyevd,45
+2000,2000,f64,1.34, RTX-4090-24GB, cusolverMgsyevd,123
+5000,5000,f64,2.44, RTX-4090-24GB, cusolverMgsyevd,675
+10000,10000,f64,7.65, RTX-4090-24GB, cusolverMgsyevd,3182
+15000,15000,f64,20.44, RTX-4090-24GB, cusolverMgsyevd,5920
+20000,20000,f64,44.0, RTX-4090-24GB, cusolverMgsyevd,10507
+25000,25000,f64,81.65, RTX-4090-24GB, cusolverMgsyevd,16084
+30000,30000,f64,, RTX-4090-24GB, cusolverMgsyevd,23227
+35000,35000,f64,, RTX-4090-24GB, cusolverMgsyevd,31680
+40000,40000,f64,, RTX-4090-24GB, cusolverMgsyevd,41443
+45000,45000,f64,, RTX-4090-24GB, cusolverMgsyevd,51939
+50000,50000,f64,, RTX-4090-24GB, cusolverMgsyevd,64259
+100,5,f32,0.0, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+1000,50,f32,0.03, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+2000,100,f32,0.08, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+5000,250,f32,0.66, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+10000,500,f32,10.91, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+15000,750,f32,49.07, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+20000,1000,f32,125.93, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+25000,1250,f32,249.06, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+30000,1500,f32,430.38, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+35000,1750,f32,680.32, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+40000,2000,f32,, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+45000,2250,f32,, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+50000,2500,f32,, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+100,5,f64,0.0, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+1000,50,f64,0.03, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+2000,100,f64,0.14, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+5000,250,f64,1.85, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+10000,500,f64,26.86, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+15000,750,f64,102.0, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+20000,1000,f64,244.91, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+25000,1250,f64,475.47, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+30000,1500,f64,819.24, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+35000,1750,f64,1299.69, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+40000,2000,f64,, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+45000,2250,f64,, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
+50000,2500,f64,, Ryzen 9 7900X 12-Core, scipy.linalg.eigh,0
