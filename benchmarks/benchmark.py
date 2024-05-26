@@ -82,7 +82,7 @@ if __name__ == "__main__":
 
     should_profile_cuda = True
     should_profile_cuda_mg = True
-    should_profile_scipy = True
+    should_profile_scipy = False
 
     if should_profile_cuda:
         device_name = cuda.get_device_name(0)
@@ -93,7 +93,10 @@ if __name__ == "__main__":
                 print_stats(N, num_eigs, dtype, run_time, device_name, method_name, workspace_bytes)
 
     if should_profile_cuda_mg:
-        for num_devices in range(1, cuda.device_count() + 1):
+        device_count_progression = [1, 2, 4, 8]
+        for num_devices in device_count_progression:
+            if num_devices > cuda.device_count():
+                break
             device_names = []
             for device_num in range(num_devices):
                 device_name = cuda.get_device_name(device_num)
