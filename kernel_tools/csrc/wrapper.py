@@ -177,9 +177,8 @@ def syevdx_workspace_query(
 def call_mgSyevd(queue, out, d, max_num_devices, verbose):
     try:
         SingletonClass().kernel.cusolverMgSyevd_export(out, d, max_num_devices, verbose)
-        queue.put(True)
     except Exception as e:
-        queue.put(False)
+        queue.put(e)
 
 def mgSyevd(a, overwrite_a = False, max_num_devices=16, verbose = False):
     # This function allocates outside of PyTorch, should release as much vram as possible before call.
@@ -210,10 +209,9 @@ def mgSyevd(a, overwrite_a = False, max_num_devices=16, verbose = False):
     p.start()
     p.join()
 
-    while not queue.empty():
-        print(queue.get())
-    # if not success:
-    #     raise ValueError("out of memory?")
+    if not queue.empty():
+        error = queue.get()
+        raise ValueError(f'mgSyevd exception:{error}')
 
     return d, out.T
 

@@ -47,7 +47,7 @@ def profile_cuda_mg(N, dtype, max_num_devices, verbose=False):
         end = time.time()
         return (end - start), workspace_bytes
     except Exception as e:
-        print(f'{e}')
+        # print(f'{e}')
         return None, workspace_bytes
     
 def print_stats(
@@ -81,8 +81,8 @@ if __name__ == "__main__":
     # n_dtypes = [torch.float32, torch.float64]
     n_dtypes = [torch.float32]
 
-    should_profile_cuda = False
-    should_profile_cuda_mg = True
+    should_profile_cuda = True
+    should_profile_cuda_mg = False
     should_profile_scipy = False
 
     if should_profile_scipy:
