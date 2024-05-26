@@ -1,0 +1,104 @@
+N:100, num_eigs:5, dtype:torch.float32, run_time:0.017764806747436523, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:224740
+N:1000, num_eigs:50, dtype:torch.float32, run_time:0.037641048431396484, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:12052132
+N:2000, num_eigs:100, dtype:torch.float32, run_time:0.0707244873046875, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:48104132
+N:5000, num_eigs:250, dtype:torch.float32, run_time:0.4468059539794922, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:300260132
+N:10000, num_eigs:500, dtype:torch.float32, run_time:2.32476806640625, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:1200520132
+N:15000, num_eigs:750, dtype:torch.float32, run_time:6.1986284255981445, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:2700780132
+N:20000, num_eigs:1000, dtype:torch.float32, run_time:14.500000953674316, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:4801040132
+N:25000, num_eigs:1250, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:7501300132
+N:30000, num_eigs:1500, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:10801560132
+N:35000, num_eigs:1750, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:14701820132
+N:40000, num_eigs:2000, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:19202080132
+N:45000, num_eigs:2250, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:24302340132
+N:50000, num_eigs:2500, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:30002600132
+N:100, num_eigs:5, dtype:torch.float64, run_time:0.007077693939208984, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:449352
+N:1000, num_eigs:50, dtype:torch.float64, run_time:0.0515141487121582, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:24076136
+N:2000, num_eigs:100, dtype:torch.float64, run_time:0.16107630729675293, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:96152136
+N:5000, num_eigs:250, dtype:torch.float64, run_time:1.8053743839263916, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:600380136
+N:10000, num_eigs:500, dtype:torch.float64, run_time:11.325151205062866, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:2400760136
+N:15000, num_eigs:750, dtype:torch.float64, run_time:28.868696212768555, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:5401140136
+N:20000, num_eigs:1000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:9601520136
+N:25000, num_eigs:1250, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:15001900136
+N:30000, num_eigs:1500, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:21602280136
+N:35000, num_eigs:1750, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:29402660136
+N:40000, num_eigs:2000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:38403040136
+N:45000, num_eigs:2250, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:48603420136
+N:50000, num_eigs:2500, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverSyevdx, workspace_bytes:60003800136
+N:100, num_eigs:100, dtype:torch.float32, run_time:1.7202601432800293, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:20166016
+N:1000, num_eigs:1000, dtype:torch.float32, run_time:1.8563182353973389, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:49957888
+N:2000, num_eigs:2000, dtype:torch.float32, run_time:2.0561039447784424, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:143571328
+N:5000, num_eigs:5000, dtype:torch.float32, run_time:3.1457159519195557, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:798547456
+N:10000, num_eigs:10000, dtype:torch.float32, run_time:7.622164726257324, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:3673760128
+N:15000, num_eigs:15000, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:7025997440
+N:20000, num_eigs:20000, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:12473362688
+N:25000, num_eigs:25000, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:19094459648
+N:30000, num_eigs:30000, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:27576996992
+N:35000, num_eigs:35000, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:37615290240
+N:40000, num_eigs:40000, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:49209345792
+N:45000, num_eigs:45000, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:61671459968
+N:50000, num_eigs:50000, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:76300687488
+N:100, num_eigs:100, dtype:torch.float64, run_time:1.7150201797485352, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:19923456
+N:1000, num_eigs:1000, dtype:torch.float64, run_time:1.9108049869537354, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:45054976
+N:2000, num_eigs:2000, dtype:torch.float64, run_time:2.2458717823028564, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:123935232
+N:5000, num_eigs:5000, dtype:torch.float64, run_time:4.914302110671997, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:675728896
+N:10000, num_eigs:10000, dtype:torch.float64, run_time:19.005505561828613, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:3182363136
+N:15000, num_eigs:15000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:5920258816
+N:20000, num_eigs:20000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:10507525376
+N:25000, num_eigs:25000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:16084200704
+N:30000, num_eigs:30000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:23227407616
+N:35000, num_eigs:35000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:31680607232
+N:40000, num_eigs:40000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:41443812096
+N:45000, num_eigs:45000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:51939904768
+N:50000, num_eigs:50000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, method:cusolverMgsyevd, workspace_bytes:64259049728
+N:100, num_eigs:100, dtype:torch.float32, run_time:1.8578464984893799, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:20166016
+N:1000, num_eigs:1000, dtype:torch.float32, run_time:2.040008783340454, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:34269824
+N:2000, num_eigs:2000, dtype:torch.float32, run_time:2.291236639022827, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:81137664
+N:5000, num_eigs:5000, dtype:torch.float32, run_time:3.412510633468628, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:408811008
+N:10000, num_eigs:10000, dtype:torch.float32, run_time:6.62648344039917, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:3018338688
+N:15000, num_eigs:15000, dtype:torch.float32, run_time:14.852328300476074, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:3837569408
+N:20000, num_eigs:20000, dtype:torch.float32, run_time:27.508121490478516, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:6247142656
+N:25000, num_eigs:25000, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:9752617728
+N:30000, num_eigs:30000, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:14033087744
+N:35000, num_eigs:35000, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:19091437440
+N:40000, num_eigs:40000, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:24927666688
+N:45000, num_eigs:45000, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:30847731200
+N:50000, num_eigs:50000, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:38162652544
+N:100, num_eigs:100, dtype:torch.float64, run_time:1.864060878753662, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:19923456
+N:1000, num_eigs:1000, dtype:torch.float64, run_time:2.059819459915161, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:31818496
+N:2000, num_eigs:2000, dtype:torch.float64, run_time:2.442725896835327, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:71319552
+N:5000, num_eigs:5000, dtype:torch.float64, run_time:4.61445426940918, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:347401728
+N:10000, num_eigs:10000, dtype:torch.float64, run_time:13.913129568099976, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:2772640256
+N:15000, num_eigs:15000, dtype:torch.float64, run_time:36.80966091156006, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:3284701696
+N:20000, num_eigs:20000, dtype:torch.float64, run_time:75.49843382835388, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:5264225536
+N:25000, num_eigs:25000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:8216768256
+N:30000, num_eigs:30000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:11821428992
+N:35000, num_eigs:35000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:16081089536
+N:40000, num_eigs:40000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:20995749376
+N:45000, num_eigs:45000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:25981953536
+N:50000, num_eigs:50000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 3070 Ti, NVIDIA GeForce RTX 3070, method:cusolverMgsyevd, workspace_bytes:32141833728
+N:100, num_eigs:5, dtype:torch.float32, run_time:0.0006868839263916016, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:1000, num_eigs:50, dtype:torch.float32, run_time:0.1074671745300293, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:2000, num_eigs:100, dtype:torch.float32, run_time:0.15993642807006836, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:5000, num_eigs:250, dtype:torch.float32, run_time:0.984447717666626, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:10000, num_eigs:500, dtype:torch.float32, run_time:8.786656856536865, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:15000, num_eigs:750, dtype:torch.float32, run_time:50.273560762405396, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:20000, num_eigs:1000, dtype:torch.float32, run_time:122.14194512367249, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:25000, num_eigs:1250, dtype:torch.float32, run_time:235.34262084960938, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:30000, num_eigs:1500, dtype:torch.float32, run_time:399.93492317199707, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:35000, num_eigs:1750, dtype:torch.float32, run_time:624.0937769412994, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:40000, num_eigs:2000, dtype:torch.float32, run_time:None, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:45000, num_eigs:2250, dtype:torch.float32, run_time:None, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:50000, num_eigs:2500, dtype:torch.float32, run_time:None, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:100, num_eigs:5, dtype:torch.float64, run_time:0.0006260871887207031, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:1000, num_eigs:50, dtype:torch.float64, run_time:0.06646442413330078, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:2000, num_eigs:100, dtype:torch.float64, run_time:0.33539605140686035, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:5000, num_eigs:250, dtype:torch.float64, run_time:1.8970341682434082, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:10000, num_eigs:500, dtype:torch.float64, run_time:25.054231643676758, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:15000, num_eigs:750, dtype:torch.float64, run_time:93.25932192802429, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:20000, num_eigs:1000, dtype:torch.float64, run_time:211.60771870613098, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:25000, num_eigs:1250, dtype:torch.float64, run_time:399.443922996521, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:30000, num_eigs:1500, dtype:torch.float64, run_time:670.2118513584137, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:35000, num_eigs:1750, dtype:torch.float64, run_time:1041.7957146167755, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:40000, num_eigs:2000, dtype:torch.float64, run_time:None, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:45000, num_eigs:2250, dtype:torch.float64, run_time:None, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:50000, num_eigs:2500, dtype:torch.float64, run_time:None, device:AMD Ryzen Threadripper 3960X 24-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
