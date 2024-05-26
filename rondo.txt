@@ -1,0 +1,78 @@
+N:100, num_eigs:5, dtype:torch.float32, run_time:0.011639118194580078, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:224740
+N:1000, num_eigs:50, dtype:torch.float32, run_time:0.021250247955322266, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:12052132
+N:2000, num_eigs:100, dtype:torch.float32, run_time:0.01878643035888672, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:48104132
+N:5000, num_eigs:250, dtype:torch.float32, run_time:0.13426613807678223, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:300260132
+N:10000, num_eigs:500, dtype:torch.float32, run_time:1.0960216522216797, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:1200520132
+N:15000, num_eigs:750, dtype:torch.float32, run_time:3.48783802986145, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:2700780132
+N:20000, num_eigs:1000, dtype:torch.float32, run_time:8.041262865066528, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:4801040132
+N:25000, num_eigs:1250, dtype:torch.float32, run_time:15.525998830795288, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:7501300132
+N:30000, num_eigs:1500, dtype:torch.float32, run_time:25.999504327774048, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:10801560132
+N:35000, num_eigs:1750, dtype:torch.float32, run_time:41.133421421051025, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:14701820132
+N:40000, num_eigs:2000, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:19202080132
+N:45000, num_eigs:2250, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:24302340132
+N:50000, num_eigs:2500, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:30002600132
+N:100, num_eigs:5, dtype:torch.float64, run_time:0.0070307254791259766, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:449352
+N:1000, num_eigs:50, dtype:torch.float64, run_time:0.028427839279174805, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:24076136
+N:2000, num_eigs:100, dtype:torch.float64, run_time:0.06244611740112305, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:96152136
+N:5000, num_eigs:250, dtype:torch.float64, run_time:0.6554110050201416, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:600380136
+N:10000, num_eigs:500, dtype:torch.float64, run_time:4.1425981521606445, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:2400760136
+N:15000, num_eigs:750, dtype:torch.float64, run_time:11.054589986801147, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:5401140136
+N:20000, num_eigs:1000, dtype:torch.float64, run_time:29.120691299438477, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:9601520136
+N:25000, num_eigs:1250, dtype:torch.float64, run_time:52.1819634437561, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:15001900136
+N:30000, num_eigs:1500, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:21602280136
+N:35000, num_eigs:1750, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:29402660136
+N:40000, num_eigs:2000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:38403040136
+N:45000, num_eigs:2250, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:48603420136
+N:50000, num_eigs:2500, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 4090, method:cusolverSyevdx, workspace_bytes:60003800136
+N:100, num_eigs:100, dtype:torch.float32, run_time:1.0346014499664307, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:20166016
+N:1000, num_eigs:1000, dtype:torch.float32, run_time:1.121391773223877, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:49957888
+N:2000, num_eigs:2000, dtype:torch.float32, run_time:1.236234426498413, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:143571328
+N:5000, num_eigs:5000, dtype:torch.float32, run_time:1.755993127822876, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:798547456
+N:10000, num_eigs:10000, dtype:torch.float32, run_time:3.469217300415039, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:3673760128
+N:15000, num_eigs:15000, dtype:torch.float32, run_time:7.950328350067139, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:7025997440
+N:20000, num_eigs:20000, dtype:torch.float32, run_time:16.109558582305908, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:12473362688
+N:25000, num_eigs:25000, dtype:torch.float32, run_time:29.35252046585083, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:19094459648
+N:30000, num_eigs:30000, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:27576996992
+N:35000, num_eigs:35000, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:37615290240
+N:40000, num_eigs:40000, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:49209345792
+N:45000, num_eigs:45000, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:61671459968
+N:50000, num_eigs:50000, dtype:torch.float32, run_time:None, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:76300687488
+N:100, num_eigs:100, dtype:torch.float64, run_time:1.0236537456512451, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:19923456
+N:1000, num_eigs:1000, dtype:torch.float64, run_time:1.1398286819458008, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:45054976
+N:2000, num_eigs:2000, dtype:torch.float64, run_time:1.3390896320343018, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:123935232
+N:5000, num_eigs:5000, dtype:torch.float64, run_time:2.4372169971466064, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:675728896
+N:10000, num_eigs:10000, dtype:torch.float64, run_time:7.647592067718506, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:3182363136
+N:15000, num_eigs:15000, dtype:torch.float64, run_time:20.437946557998657, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:5920258816
+N:20000, num_eigs:20000, dtype:torch.float64, run_time:44.00131273269653, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:10507525376
+N:25000, num_eigs:25000, dtype:torch.float64, run_time:81.64895629882812, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:16084200704
+N:30000, num_eigs:30000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:23227407616
+N:35000, num_eigs:35000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:31680607232
+N:40000, num_eigs:40000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:41443812096
+N:45000, num_eigs:45000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:51939904768
+N:50000, num_eigs:50000, dtype:torch.float64, run_time:None, device:NVIDIA GeForce RTX 4090, method:cusolverMgsyevd, workspace_bytes:64259049728
+N:100, num_eigs:5, dtype:torch.float32, run_time:0.0005781650543212891, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:1000, num_eigs:50, dtype:torch.float32, run_time:0.028871536254882812, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:2000, num_eigs:100, dtype:torch.float32, run_time:0.08107423782348633, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:5000, num_eigs:250, dtype:torch.float32, run_time:0.6614663600921631, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:10000, num_eigs:500, dtype:torch.float32, run_time:10.91232967376709, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:15000, num_eigs:750, dtype:torch.float32, run_time:49.06523132324219, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:20000, num_eigs:1000, dtype:torch.float32, run_time:125.92738723754883, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:25000, num_eigs:1250, dtype:torch.float32, run_time:249.06003546714783, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:30000, num_eigs:1500, dtype:torch.float32, run_time:430.37683486938477, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:35000, num_eigs:1750, dtype:torch.float32, run_time:680.3198094367981, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:40000, num_eigs:2000, dtype:torch.float32, run_time:None, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:45000, num_eigs:2250, dtype:torch.float32, run_time:None, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:50000, num_eigs:2500, dtype:torch.float32, run_time:None, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:100, num_eigs:5, dtype:torch.float64, run_time:0.0005307197570800781, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:1000, num_eigs:50, dtype:torch.float64, run_time:0.033460140228271484, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:2000, num_eigs:100, dtype:torch.float64, run_time:0.14246416091918945, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:5000, num_eigs:250, dtype:torch.float64, run_time:1.8480255603790283, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:10000, num_eigs:500, dtype:torch.float64, run_time:26.86431312561035, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:15000, num_eigs:750, dtype:torch.float64, run_time:102.00155544281006, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:20000, num_eigs:1000, dtype:torch.float64, run_time:244.9102931022644, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:25000, num_eigs:1250, dtype:torch.float64, run_time:475.47353315353394, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:30000, num_eigs:1500, dtype:torch.float64, run_time:819.2435867786407, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:35000, num_eigs:1750, dtype:torch.float64, run_time:1299.6917161941528, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:40000, num_eigs:2000, dtype:torch.float64, run_time:None, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:45000, num_eigs:2250, dtype:torch.float64, run_time:None, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
+N:50000, num_eigs:2500, dtype:torch.float64, run_time:None, device:AMD Ryzen 9 7900X 12-Core Processor, method:scipy.linalg.eigh, workspace_bytes:None
