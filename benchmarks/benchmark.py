@@ -81,16 +81,8 @@ if __name__ == "__main__":
     n_dtypes = [torch.float32, torch.float64]
 
     should_profile_cuda = True
-    should_profile_cuda_mg = False
-    should_profile_scipy = False
-
-    if should_profile_scipy:
-        method_name = 'scipy.linalg.eigh'
-        device_name = cpuinfo.get_cpu_info()['brand_raw']
-        for dtype in n_dtypes:
-            for N, num_eigs in list(zip(n_sizes, n_eigs)):
-                run_time = profile_scipy(N, num_eigs, dtype)
-                print_stats(N, num_eigs, dtype, run_time, device_name, method_name, None)
+    should_profile_cuda_mg = True
+    should_profile_scipy = True
 
     if should_profile_cuda:
         device_name = cuda.get_device_name(0)
@@ -115,3 +107,11 @@ if __name__ == "__main__":
                 for N in n_sizes:
                     run_time, workspace_bytes = profile_cuda_mg(N, dtype, num_devices, verbose=verbose)
                     print_stats(N, N, dtype, run_time, device_names_str, method_name, workspace_bytes)
+
+    if should_profile_scipy:
+        method_name = 'scipy.linalg.eigh'
+        device_name = cpuinfo.get_cpu_info()['brand_raw']
+        for dtype in n_dtypes:
+            for N, num_eigs in list(zip(n_sizes, n_eigs)):
+                run_time = profile_scipy(N, num_eigs, dtype)
+                print_stats(N, num_eigs, dtype, run_time, device_name, method_name, None)

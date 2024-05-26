@@ -26,7 +26,7 @@ def run():
     kernel_fn = lambda x, z: kernels.laplacian(x, z, bandwidth=20.)
     dtype = torch.float64
 
-    N = 100
+    N = 10000
     D = 2
 
 
