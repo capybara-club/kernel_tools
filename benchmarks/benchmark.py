@@ -74,12 +74,11 @@ def profile_scipy(N, num_eigs, dtype):
     return end - start
 
 if __name__ == "__main__":
-    n_sizes = [15_000, 20_000, 25_000]
-    # n_sizes = [100, 1_000, 2_000, 5_000, 10_000, 15_000, 20_000, 25_000, 30_000, 35_000, 40_000, 45_000, 50_000]
-    # n_sizes = [100, 1_000, 2_000, 5_000, 10_000, ]
-    n_eigs =  [ 10,    50,   100,   200,    500,    750,  1_000,  2_000,  3_000,  4_000,  5_000,  7_000,  9_000]
-    # n_dtypes = [torch.float32, torch.float64]
-    n_dtypes = [torch.float32]
+    # n_sizes = [15_000, 20_000, 25_000]
+    n_sizes = [100, 1_000, 2_000, 5_000, 10_000, 15_000, 20_000, 25_000, 30_000, 35_000, 40_000, 45_000, 50_000]
+    eigenvalue_multiplier = 0.05
+    n_eigs =  list(map(lambda x: int(x * eigenvalue_multiplier), n_sizes))
+    n_dtypes = [torch.float32, torch.float64]
 
     should_profile_cuda = True
     should_profile_cuda_mg = False
