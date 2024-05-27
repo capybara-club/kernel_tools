@@ -25,6 +25,9 @@ def get_ext_modules():
             ),
         ]
 
+with open('requirements.txt') as f:
+    requirements = f.read().splitlines()
+
 setup(
     name='kernel_tools',
     version='0.1',
@@ -34,8 +37,5 @@ setup(
     cmdclass={
         'build_ext': BuildExtension
     },
-    # package_data={
-    #     'kernel_tools.csrc': ['*.cpp', '*.h', '*.cu'],
-    # },
-    # include_package_data=True,
+    install_requires=requirements,
 )
