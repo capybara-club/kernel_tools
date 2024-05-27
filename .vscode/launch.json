@@ -8,20 +8,8 @@
             "name": "Python Debugger: Run Example",
             "type": "debugpy",
             "request": "launch",
-            // "program": "${workspaceFolder}/examples/run_example_rfm.py",
-            // "program": "${workspaceFolder}/examples/multi_gpu_test.py",
-            // "program": "${workspaceFolder}/examples/rfm_test.py",
-            // "program": "${workspaceFolder}/examples/something.py",
-            // "program": "${workspaceFolder}/examples/run_example.py",
-            // "program": "${workspaceFolder}/examples/main3.py",
-            // "program": "${workspaceFolder}/eigenpro/sandbox/cuda_pytorch_interop/main.py",
-            "program": "${workspaceFolder}/examples/run_mg_syevd.py",
-            // "program": "${workspaceFolder}/eigenpro/sandbox/cuda_pytorch_interop/main3.py",
-            // "program": "${workspaceFolder}/examples/batched_sum_synthetic_kernel.py",
-            // "program": "${workspaceFolder}/examples/main2.py",
-            // "program": "${workspaceFolder}/examples/rfm_weird.py",
-            // "program": "${workspaceFolder}/examples/rfm.py",
-            // "program": "${workspaceFolder}/eigenpro/experimental/run_example.py",
+            "program": "${workspaceFolder}/examples/run_syevdx.py",
+            // "program": "${workspaceFolder}/examples/run_mg_syevd.py",
             "console": "integratedTerminal"
         }
     ]

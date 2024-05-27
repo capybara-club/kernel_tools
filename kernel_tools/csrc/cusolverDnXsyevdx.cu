@@ -123,7 +123,6 @@ void cusolverDnXsyevdx_template(
     bool verbose
 ) {
     cusolverDnHandle_t handle = get_cusolver_dn_handle().get();
-    // because pytorch is row major and cublas is column major, the triangle is flipped
     cusolverEigRange_t range = eigen_range ? CUSOLVER_EIG_RANGE_I : CUSOLVER_EIG_RANGE_ALL;
     cublasFillMode_t uplo = upper_triangle ? CUBLAS_FILL_MODE_UPPER : CUBLAS_FILL_MODE_LOWER;
     cusolverEigMode_t jobz = eigenvalues_only ? CUSOLVER_EIG_MODE_NOVECTOR : CUSOLVER_EIG_MODE_VECTOR;
