@@ -155,7 +155,7 @@ def syevdx(
         if eigvals_only:
             return w
         else:
-            return w, out
+            return w, out.T
         
 def syevdx_workspace_query(
         N,

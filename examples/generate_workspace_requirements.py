@@ -14,6 +14,7 @@ if __name__ == "__main__":
 
         num_gpus = [1,2,4,8]
         for num_gpu in num_gpus:
+            # These are slow due to spawning a new process with a new cuda context and new handle for each call.
             workspace_bytes = cusolver_mg_eigh_workspace_requirements(N, dtype, num_gpu)
             print(f'{workspace_bytes // 1_000_000}, ', end='')
         print('')
