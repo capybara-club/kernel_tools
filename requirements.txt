@@ -3,3 +3,4 @@ setuptools
 numpy
 ninja
 py-cpuinfo
+scipy
