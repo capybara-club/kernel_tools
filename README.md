@@ -3,9 +3,15 @@ Tools for kernel methods for PyTorch and Cuda devices
 
 ## Installation
 
-This library uses .cu/.cpp c++ code. It can be installed with `pip install .` or for development with `pip install -e .` You might need to install python development headers and tools like setuptools to get this working.
+To install: 
 
-Installation compiles the .cu/.cpp files and can take a minute or two.
+`pip install git+https://github.com/capybara-club/kernel_tools.git`
+
+This library uses .cu/.cpp c++ code and the install/compile time can take a minute or two.
+
+It can also be installed with `pip install .` or for development with `pip install -e .` You might need to install python development headers and tools like setuptools to get this working.
+
+Let me know if there are any issues during install, like missing requirements.
 
 ## linalg
 Exports two [cuSOLVER](https://docs.nvidia.com/cuda/cusolver/) functions:
