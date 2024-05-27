@@ -2,7 +2,7 @@ import os
 
 # Common paths and names for sharing between COMPILED and JIT build styles
 NAME="kernel_tools_cpp_cuda"
-SRC_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'kernel_tools/csrc'))
+SRC_DIR = os.path.join('kernel_tools','csrc')
 INCLUDE_DIRS = [SRC_DIR]
 SOURCES = [
     os.path.join(SRC_DIR, 'bindings.cpp'),

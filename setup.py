@@ -1,14 +1,13 @@
-from setuptools import setup, Extension
+from setuptools import setup, Extension, find_packages
 from torch.utils.cpp_extension import BuildExtension, CUDAExtension
 import os
 import sys
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+
+import os
 from build_config import NAME, INCLUDE_DIRS, SOURCES, EXTRA_COMPILE_ARGS, EXTRA_LINK_ARGS
 
-this_dir = os.path.dirname(os.path.curdir)
-library_name = "kernel_tools"
-extensions_dir = os.path.join(this_dir, library_name, "csrc")
 
 USE_JIT = os.getenv('USE_KERNEL_TOOLS_JIT', '0') == '1'
 
@@ -29,10 +28,14 @@ def get_ext_modules():
 setup(
     name='kernel_tools',
     version='0.1',
+    packages=find_packages(),
     description='PyTorch extension with C++ and CUDA',
-    packages=['kernel_tools'],
     ext_modules=get_ext_modules(),
     cmdclass={
         'build_ext': BuildExtension
-    }
+    },
+    # package_data={
+    #     'kernel_tools.csrc': ['*.cpp', '*.h', '*.cu'],
+    # },
+    # include_package_data=True,
 )

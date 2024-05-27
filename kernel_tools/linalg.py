@@ -1,4 +1,4 @@
-from .csrc.wrapper import mgSyevd, syevdx, syevdx_workspace_query, mgSyevd_workspace_query
+from kernel_tools.csrc.wrapper import mgSyevd, syevdx, syevdx_workspace_query, mgSyevd_workspace_query
 
 def cusolver_eigh(
         a,
