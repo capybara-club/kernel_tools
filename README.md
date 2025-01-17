@@ -11,11 +11,15 @@ This library uses .cu/.cpp c++ code and the install/compile time can take a minu
 
 It can also be installed with `pip install .` or for development with `pip install -e .` You might need to install python development headers and tools like setuptools to get this working.
 
+### WARNING
+This version of the library requires cuda 12.6 (the first version to export cusolverDnXsyevBatched)
+
 Let me know if there are any issues during install, like missing requirements.
 
 ## linalg
-Exports two [cuSOLVER](https://docs.nvidia.com/cuda/cusolver/) functions:
+Exports three [cuSOLVER](https://docs.nvidia.com/cuda/cusolver/) functions:
 * [cusolverDnXsyevdx](https://docs.nvidia.com/cuda/cusolver/#cusolverdnxgesvd)
+* [cusolverDnXsyevBatched](https://docs.nvidia.com/cuda/cusolver/#cusolverdnxsyevbatched)
 * [cusolverMgSyevd](https://docs.nvidia.com/cuda/cusolver/#cusolvermgsyevd)
 
 ### cusolverDnXsyevdx
@@ -34,6 +38,21 @@ The workspace does not include the memory necessary to store the matrix.
 If you request a range of eigenvectors, the code returns a view over the original matrix (or even the 
 cloned matrix if overwrite_a is False). This view actually prevents the entire rest of the matrix from
 being garbage collected. Instead of doing a clone of this view inside the PyTorch code (out of fear this makes the difference to exceed vram), it is up to the user to clone this view or transfer it back to cpu straight after.
+
+### cusolverDnXsyevBatched
+
+This function extracts all eigenvalues/eigenvectors of a batch of matrices. This function runs on one Nvidia device.
+
+This function is available in this library at `kernel_tools.linalg.cusolver_batched_eigh`
+
+The function to estimate workspace size for a future run is `kernel_tools.linalg.cusolver_batched_eigh_workspace_requirements`.
+
+The workspace does not include the memory necessary to store the matrix.
+
+### cusolverDnXsyevBatched WARNING:
+
+This function will return an invalid value error code if the combined N * N * batch_size for the requested syev is too large. I see this issue crop up with N=5000 and batch_size larger than 28.
+N=5000, batch_size=28 will run fine. I filed a bug report for this issue and the issue is known to Nvidia. They are working on a fix and they say it's related to an integer bounds check.
 
 ### cusolverMgSyevd
 

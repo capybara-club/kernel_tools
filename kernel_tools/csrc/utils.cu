@@ -15,34 +15,63 @@
 // 'lda', 'ldc'...
 void tensor_stats(torch::Tensor a, bool *is_transpose, int *leading_dimension) {
     int num_dims = a.dim();
-    if (num_dims != 2) {
-        throw std::runtime_error("Dimension of tensor needs to be 2");
+    if (num_dims != 2 && num_dims != 3) {
+        throw std::runtime_error("Dimension of tensor needs to be 2 or 3");
     }
 
-    int d_y = a.size(0);
-    int d_x = a.size(1);
+    if (num_dims == 2) {
+        int d_y = a.size(0);
+        int d_x = a.size(1);
 
-    int s_y = a.stride(0);
-    int s_x = a.stride(1);
+        int s_y = a.stride(0);
+        int s_x = a.stride(1);
 
-    if (s_y != 1 && s_x != 1) {
-        throw std::runtime_error("Neither of the tensor strides are 1, this is a strange tensor layout");
-    }
+        if (s_y != 1 && s_x != 1) {
+            throw std::runtime_error("Neither of the tensor strides are 1, this is a strange tensor layout");
+        }
 
-    if (d_y == 1 && s_y == 1 && s_x == 1) {
+        if (d_y == 1 && s_y == 1 && s_x == 1) {
+            *is_transpose = false;
+            *leading_dimension = 1;
+            return;
+        }
+
+        if (s_x == 1) {
+            *is_transpose = true;
+            *leading_dimension = s_y;
+            return;
+        }
+
         *is_transpose = false;
-        *leading_dimension = 1;
-        return;
-    }
+        *leading_dimension = s_x;
+    } else {
+        int batch = a.size(0);
+        int d_y = a.size(1);
+        int d_x = a.size(2);
 
-    if (s_x == 1) {
-        *is_transpose = true;
-        *leading_dimension = s_y;
-        return;
-    }
+        int s_batch = a.stride(0);
+        int s_y = a.stride(1);
+        int s_x = a.stride(2);
 
-    *is_transpose = false;
-    *leading_dimension = s_x;
+        if (s_y != 1 && s_x != 1) {
+            throw std::runtime_error("Neither of the tensor strides are 1, this is a strange tensor layout");
+        }
+
+        if (d_y == 1 && s_y == 1 && s_x == 1) {
+            *is_transpose = false;
+            *leading_dimension = 1;
+            return;
+        }
+
+        if (s_x == 1) {
+            *is_transpose = true;
+            *leading_dimension = s_y;
+            return;
+        }
+
+        *is_transpose = false;
+        *leading_dimension = s_x;
+    }
 
     // printf("%d, %d, %d, %d\n", d_y, d_x, s_y, s_x);
 }

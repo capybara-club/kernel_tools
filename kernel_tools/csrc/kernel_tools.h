@@ -22,6 +22,24 @@ void cusolverDnXsyevdx_workspace_query_export(
     torch::Tensor workspaceBytesHost
 );
 
+void cusolverDnXsyev_batched_export(
+    torch::Tensor a, 
+    torch::Tensor w,
+    torch::Tensor info,
+    bool upper_triangle,
+    bool eigenvalues_only,
+    uintptr_t stream_ptr,
+    bool verbose
+);
+
+void cusolverDnXsyev_batched_workspace_query_export(
+    int N,
+    int batch_size,
+    bool is_fp32,
+    torch::Tensor workspaceBytesDevice,
+    torch::Tensor workspaceBytesHost
+);
+
 void cusolverMgSyevd_export(
     torch::Tensor a, 
     torch::Tensor d,

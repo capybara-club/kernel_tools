@@ -1,4 +1,4 @@
-from kernel_tools.csrc.wrapper import mgSyevd, syevdx, syevdx_workspace_query, mgSyevd_workspace_query
+from kernel_tools.csrc.wrapper import mgSyevd, syevdx, syevdx_workspace_query, syev_batched, syev_batched_workspace_query, mgSyevd_workspace_query
 
 def cusolver_eigh(
         a,
@@ -58,6 +58,57 @@ def cusolver_eigh_workspace_requirements(N, dtype):
     """
 
     return syevdx_workspace_query(N, dtype)
+
+#TODO: update these docs
+def cusolver_batched_eigh(
+        a,
+        overwrite_a = False,
+        lower = True, 
+        eigvals_only = False,
+        verbose = False
+):
+    """
+    Uses cusolver cusolverDnXsyev_batched to get all the eigenvalues / eigenvectors
+    of a batch of systems (batch_size, N, N). The base call
+    to cusolverDnXsyev_batched overwrites the 'a' matrix and additionally allocates a workspace.
+    If overwrite_a is False, then the a matrix is cloned and returned.
+
+    Parameters:
+    a (torch::Tensor): The matrix
+    overwrite_a: Avoids a copy of the a tensor when true
+    lower: Use the lower triangle, if false, use the upper triangle of the symmetric matrix
+    eigvals_only: Only return the eigenvalues of a. If overwrite_a is True, then
+        'a' will not be copied and this routine will still destroy 'a'.
+    verbose: Currently only prints the requested workspace size. This is useful if you are crashing.
+
+    Returns:
+    eigenvalues, eigenvectors if eigvals_only is false
+    eigenvalues of the range specified if eigvals_only is true
+    """
+
+    return syev_batched(a, 
+                  overwrite_a=overwrite_a, 
+                  lower=lower, 
+                  eigvals_only=eigvals_only,
+                  verbose=verbose
+            )
+
+def cusolver_batched_eigh_workspace_requirements(N, batch_size, dtype):
+    """
+    Returns the workspace required bytes for cusolver cusolverDnXsyev_batched for the 
+    specified problem size and data type. Only torch.float32 and torch.float64 are
+    supported.
+
+    Parameters:
+    N (torch::Tensor): The size of the symmetric matrix to extract eigenvalues/eigenvectors from
+    batch_size (torch::Tensor): The batch size
+    dtype: The data type of the matrix
+    
+    Returns:
+    workspaceInBytesDevice, workspaceInBytesHost
+    """
+
+    return syev_batched_workspace_query(N, batch_size, dtype)
 
 def cusolver_mg_eigh(
     a,

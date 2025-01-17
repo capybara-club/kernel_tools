@@ -6,7 +6,7 @@ SRC_DIR = os.path.join('kernel_tools','csrc')
 INCLUDE_DIRS = [SRC_DIR]
 SOURCES = [
     os.path.join(SRC_DIR, 'bindings.cpp'),
-    os.path.join(SRC_DIR, 'cusolverDnXsyevdx.cu'),
+    os.path.join(SRC_DIR, 'cusolverDnX.cu'),
     os.path.join(SRC_DIR, 'cusolverMgSyevd.cu'),
     os.path.join(SRC_DIR, 'utils.cu'),
 ]

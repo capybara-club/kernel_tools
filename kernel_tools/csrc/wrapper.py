@@ -174,6 +174,83 @@ def syevdx_workspace_query(
     )
     return workspaceBytesDeviceTensor.item(), workspaceBytesHostTensor.item()
 
+def syev_batched(
+        a,
+        overwrite_a,
+        lower, 
+        eigvals_only,
+        verbose
+):
+
+    if not a.is_cuda:
+        raise ValueError(f"batched a is not on a device")
+
+    if a.dim() != 3:
+        raise ValueError(f"batched a matrix is not three dimensional")
+    
+    if a.shape[1] != a.shape[2]:
+        raise ValueError(f"batched a matrix must be square")
+    
+    # if a.shape[0] != 1:
+    #     raise ValueError(f"batched a matrix must be dimension (1,X,X) for now")
+
+    if a.dtype != torch.float32 and a.dtype != torch.float64:
+        raise ValueError(f"batched a matrix must be float32 or float64")
+    
+    N = a.shape[1]
+    batch_size = a.shape[0]
+        
+    if not overwrite_a:
+        out = a.clone()
+    else:
+        out = a
+
+    w = torch.zeros(batch_size, N, dtype=a.dtype, device=a.device)
+    info = torch.zeros(batch_size, device=a.device, dtype=torch.int)
+
+    # cusolver and cublas are column_major not row_major
+    is_upper_triangle_column_major = lower
+
+    stream = cuda.current_stream()
+
+    SingletonClass().kernel.cusolverDnXsyev_batched_export(
+        out, 
+        w, 
+        info, 
+        is_upper_triangle_column_major, 
+        eigvals_only, 
+        stream.cuda_stream,
+        verbose
+    )
+
+    cpu_info = info.cpu()
+    if not (cpu_info == 0).all():
+        raise ValueError(f"info of syev_batched is not equal to 0: {cpu_info}. Check cusolver docs")
+    
+    if eigvals_only:
+        return w
+    else:
+        return w, out.transpose(1,2)
+
+def syev_batched_workspace_query(
+        N,
+        batch_size,
+        dtype
+):
+    if dtype != torch.float32 and dtype != torch.float64:
+        raise ValueError("Unsupported dtype")
+    is_fp32 = dtype == torch.float32
+    workspaceBytesDeviceTensor = torch.tensor(0, dtype=torch.uint64)
+    workspaceBytesHostTensor = torch.tensor(0, dtype=torch.uint64)
+    SingletonClass().kernel.cusolverDnXsyev_batched_workspace_query_export(
+        N,
+        batch_size,
+        is_fp32,
+        workspaceBytesDeviceTensor,
+        workspaceBytesHostTensor
+    )
+    return workspaceBytesDeviceTensor.item(), workspaceBytesHostTensor.item()
+
 def call_mgSyevd(queue, out, d, max_num_devices, verbose):
     try:
         SingletonClass().kernel.cusolverMgSyevd_export(out, d, max_num_devices, verbose)
