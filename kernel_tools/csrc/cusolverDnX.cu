@@ -62,6 +62,161 @@ CuSolverHandle& get_cusolver_dn_handle() {
 }
 
 template <typename data_type>
+void cusolverDnXgetrf_workspace_template(
+    cusolverDnHandle_t handle,
+    int64_t M,
+    int64_t N,
+    cudaDataType_t cuda_data_type,
+    int64_t lda,
+    size_t *workspaceInBytesOnDevice,
+    size_t *workspaceInBytesOnHost
+) {
+
+    cusolverStatus_t status = cusolverDnXgetrf_bufferSize(
+        handle,                     // handle
+        NULL,                       // params
+        M,                          // M
+        N,                          // N
+        cuda_data_type,             // dataTypeA
+        NULL,                       // A
+        lda,                        // lda
+        cuda_data_type,             // computeType
+        workspaceInBytesOnDevice,  // workspaceInBytesOnDevice
+        workspaceInBytesOnHost     // workspaceInBytesOnHost
+    );
+
+    if (status != CUSOLVER_STATUS_SUCCESS) {
+        std::cerr << "Failed to run cusolverDnXgetrf_bufferSize: " << status << std::endl;
+        throw std::runtime_error("Failed to run cusolverDnXgetrf_bufferSize");
+    }
+}
+
+template <typename data_type>
+void cusolverDnXgetrf_template(
+    torch::Tensor a,
+    torch::Tensor ipiv,
+    torch::Tensor info,
+    uintptr_t stream_ptr,
+    cudaDataType_t cuda_data_type,
+    bool verbose
+) {
+    cusolverDnHandle_t handle = get_cusolver_dn_handle().get();
+
+    cudaStream_t stream = reinterpret_cast<cudaStream_t>(stream_ptr);
+
+    cusolverDnSetStream(handle, stream);
+
+    size_t workspaceInBytesOnDevice;
+    size_t workspaceInBytesOnHost;
+
+    cusolverStatus_t status;
+
+    cudaDataType data_type_a = cuda_data_type;
+    cudaDataType compute_type = cuda_data_type;
+
+    int M = a.size(0);
+    int N = a.size(1);
+
+    bool is_a_T;
+    int lda;
+    tensor_stats(a, &is_a_T, &lda);
+
+    cusolverDnXgetrf_workspace_template<data_type>(
+        handle, M, N, cuda_data_type, lda, &workspaceInBytesOnDevice, &workspaceInBytesOnHost
+    );
+
+    if (verbose) {
+        printf("cusolverDnXgetrf workspace requested: device: %zu bytes, host: %zu bytes\n", workspaceInBytesOnDevice, workspaceInBytesOnHost);
+    }
+
+    void *cuda_data = cuda_alloc(workspaceInBytesOnDevice);
+    void *host_data = host_alloc(workspaceInBytesOnHost);
+
+    status = cusolverDnXgetrf(
+        handle,
+        NULL,
+        M,
+        N,
+        data_type_a,
+        a.data_ptr<data_type>(),
+        lda,
+        ipiv.data_ptr<int64_t>(),
+        compute_type,
+        cuda_data,
+        workspaceInBytesOnDevice,
+        host_data,
+        workspaceInBytesOnHost,
+        info.data_ptr<int>()
+    );
+
+    cuda_free(cuda_data);
+    host_free(host_data);
+
+    if (status != CUSOLVER_STATUS_SUCCESS) {
+        std::cerr << "Failed to run cusolverDnXgetrf: " << status << std::endl;
+        throw std::runtime_error("Failed to run cusolverDnXgetrf");
+    }
+
+}
+
+template <typename data_type>
+void cusolverDnXgetrs_template(
+    torch::Tensor a, 
+    torch::Tensor ipiv,
+    torch::Tensor b,
+    torch::Tensor info,
+    uintptr_t stream_ptr,
+    cudaDataType_t cuda_data_type,
+    bool verbose
+) {
+    cusolverDnHandle_t handle = get_cusolver_dn_handle().get();
+
+    cudaStream_t stream = reinterpret_cast<cudaStream_t>(stream_ptr);
+
+    cusolverDnSetStream(handle, stream);
+
+    cusolverStatus_t status;
+
+    cudaDataType data_type_a = cuda_data_type;
+    cudaDataType data_type_b = cuda_data_type;
+
+    int M = a.size(0);
+    int N = a.size(1);
+
+    int nrhs = b.size(1);
+
+    bool is_a_T;
+    int lda;
+    tensor_stats(a, &is_a_T, &lda);
+
+    bool is_b_T;
+    int ldb;
+    tensor_stats(b, &is_b_T, &ldb);
+
+    status = cusolverDnXgetrs(
+        handle,
+        NULL,
+        CUBLAS_OP_T,
+        N,
+        nrhs,
+        data_type_a,
+        a.data_ptr<data_type>(),
+        lda,
+        ipiv.data_ptr<int64_t>(),
+        data_type_b,
+        b.data_ptr<data_type>(),
+        ldb,
+        info.data_ptr<int>()
+    );
+
+    if (status != CUSOLVER_STATUS_SUCCESS) {
+        std::cerr << "Failed to run cusolverDnXgetrs: " << status << std::endl;
+        throw std::runtime_error("Failed to run cusolverDnXgetrs");
+    }
+
+}
+
+template <typename data_type>
 void cusolverDnXsyevdx_workspace_template(
     cusolverDnHandle_t handle,
     cusolverEigMode_t jobz,
@@ -310,6 +465,98 @@ void cusolverDnXsyev_batched_template(
 
 static void signal_handler(int signum) {
     exit(signum);
+}
+
+void cusolverDnXgetrf_export(
+    torch::Tensor a, 
+    torch::Tensor ipiv,
+    torch::Tensor info,
+    uintptr_t stream_ptr,
+    bool verbose
+) {
+    signal(SIGINT, signal_handler);
+    
+    if (a.dtype() == torch::kFloat32) {
+        return cusolverDnXgetrf_template<float>(
+            a, ipiv, info, stream_ptr, CUDA_R_32F, verbose
+        );
+    } 
+
+    if (a.dtype() == torch::kFloat64) {
+        return cusolverDnXgetrf_template<double>(
+            a, ipiv, info, stream_ptr, CUDA_R_64F, verbose
+        );
+    }
+
+    // If it gets here the dtype isn't supported
+    throw std::runtime_error("Tensor needs to have dtype either float32 or float64");
+}
+
+void cusolverDnXgetrf_workspace_query_export(
+    int M,
+    int N,
+    bool is_fp32,
+    torch::Tensor workspaceBytesDevice,
+    torch::Tensor workspaceBytesHost
+) {
+    signal(SIGINT, signal_handler);
+
+    if (workspaceBytesDevice.dtype() != torch::kUInt64 || workspaceBytesHost.dtype() != torch::kUInt64) {
+        throw std::runtime_error("Workspace sizes needs to have dtype uint64");
+    }
+
+    if (workspaceBytesDevice.numel() != 1 || workspaceBytesHost.numel() != 1) {
+        throw std::runtime_error("Workspace sizes need to have only one element");
+    }
+
+    cusolverDnHandle_t handle = get_cusolver_dn_handle().get();
+    // because pytorch is row major and cublas is column major, the triangle is flipped
+
+    size_t workspaceInBytesOnDevice;
+    size_t workspaceInBytesOnHost;
+
+    int lda = N;
+
+    if (is_fp32) {
+        cudaDataType cuda_data_type = CUDA_R_32F;
+        cusolverDnXgetrf_workspace_template<float>(
+            handle, M, N, cuda_data_type, lda, &workspaceInBytesOnDevice, &workspaceInBytesOnHost
+        );
+    } else {
+        cudaDataType cuda_data_type = CUDA_R_64F;
+        cusolverDnXgetrf_workspace_template<double>(
+            handle, M, N, cuda_data_type, lda, &workspaceInBytesOnDevice, &workspaceInBytesOnHost
+        );
+    }
+
+    *workspaceBytesDevice.data_ptr<size_t>() = workspaceInBytesOnDevice;
+    *workspaceBytesHost.data_ptr<size_t>() = workspaceInBytesOnHost;
+}
+
+void cusolverDnXgetrs_export(
+    torch::Tensor a, 
+    torch::Tensor ipiv,
+    torch::Tensor b,
+    torch::Tensor info,
+    uintptr_t stream_ptr,
+    bool verbose
+) {
+    signal(SIGINT, signal_handler);
+    
+    if (a.dtype() == torch::kFloat32) {
+        return cusolverDnXgetrs_template<float>(
+            a, ipiv, b, info, stream_ptr, CUDA_R_32F, verbose
+        );
+    } 
+
+    if (a.dtype() == torch::kFloat64) {
+        return cusolverDnXgetrs_template<double>(
+            a, ipiv, b, info, stream_ptr, CUDA_R_64F, verbose
+        );
+    }
+
+    // If it gets here the dtype isn't supported
+    throw std::runtime_error("Tensor needs to have dtype either float32 or float64");
 }
 
 void cusolverDnXsyevdx_export(

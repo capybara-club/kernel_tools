@@ -8,8 +8,9 @@
             "name": "Python Debugger: Run Example",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/examples/run_syev_batched.py",
+            // "program": "${workspaceFolder}/examples/run_syev_batched.py",
             // "program": "${workspaceFolder}/examples/run_mg_syevd.py",
+            "program": "${workspaceFolder}/examples/run_getrf.py",
             "console": "integratedTerminal"
         }
     ]

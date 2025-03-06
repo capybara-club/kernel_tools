@@ -1,4 +1,42 @@
-from kernel_tools.csrc.wrapper import mgSyevd, syevdx, syevdx_workspace_query, syev_batched, syev_batched_workspace_query, mgSyevd_workspace_query
+from kernel_tools.csrc.wrapper import mgSyevd, getrf_workspace_query, getrf, getrs, syevdx, syevdx_workspace_query, syev_batched, syev_batched_workspace_query, mgSyevd_workspace_query
+
+def cusolver_getrf_workspace_requirements(M, N, dtype):
+    """
+    Returns the workspace required bytes for cusolver cusolverDnXsyevdx for the 
+    specified problem size and data type. Only torch.float32 and torch.float64 are
+    supported.
+
+    Parameters:
+    N (torch::Tensor): The size of the symmetric matrix to extract eigenvalues/eigenvectors from
+    dtype: The data type of the matrix
+    
+    Returns:
+    workspaceInBytesDevice, workspaceInBytesHost
+    """
+
+    return getrf_workspace_query(M, N, dtype)
+
+def cusolver_getrf(
+        a,
+        overwrite_a = False,
+        verbose = False
+):
+    return getrf(a, 
+                  overwrite_a=overwrite_a, 
+                  verbose=verbose
+            )
+
+def cusolver_getrs(
+        a,
+        ipiv,
+        targets,
+        overwrite_targets = False,
+        verbose = False
+):
+    return getrs(a, ipiv, targets,
+                  overwrite_targets=overwrite_targets, 
+                  verbose=verbose
+            )
 
 def cusolver_eigh(
         a,

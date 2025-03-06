@@ -2,6 +2,31 @@
 
 #include <torch/extension.h>
 
+void cusolverDnXgetrf_export(
+    torch::Tensor a, 
+    torch::Tensor ipiv,
+    torch::Tensor info,
+    uintptr_t stream_ptr,
+    bool verbose
+);
+
+void cusolverDnXgetrf_workspace_query_export(
+    int M,
+    int N,
+    bool is_fp32,
+    torch::Tensor workspaceBytesDevice,
+    torch::Tensor workspaceBytesHost
+);
+
+void cusolverDnXgetrs_export(
+    torch::Tensor a, 
+    torch::Tensor ipiv,
+    torch::Tensor b,
+    torch::Tensor info,
+    uintptr_t stream_ptr,
+    bool verbose
+);
+
 void cusolverDnXsyevdx_export(
     torch::Tensor a, 
     torch::Tensor w,

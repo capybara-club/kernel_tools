@@ -60,6 +60,126 @@ class SingletonClass:
 def warmup():
     SingletonClass()
 
+def getrf_workspace_query(
+        M,
+        N,
+        dtype
+):
+    if dtype != torch.float32 and dtype != torch.float64:
+        raise ValueError("Unsupported dtype")
+    is_fp32 = dtype == torch.float32
+    workspaceBytesDeviceTensor = torch.tensor(0, dtype=torch.uint64)
+    workspaceBytesHostTensor = torch.tensor(0, dtype=torch.uint64)
+    SingletonClass().kernel.cusolverDnXgetrf_workspace_query_export(
+        M,
+        N,
+        is_fp32,
+        workspaceBytesDeviceTensor,
+        workspaceBytesHostTensor
+    )
+    return workspaceBytesDeviceTensor.item(), workspaceBytesHostTensor.item()
+
+def getrf(
+        a,
+        overwrite_a,
+        verbose
+):
+
+    if not a.is_cuda:
+        raise ValueError(f"a is not on a device")
+
+    if a.dim() != 2:
+        raise ValueError(f"a matrix is not two dimensional")
+    
+    if a.shape[0] != a.shape[1]:
+        raise ValueError(f"a matrix must be square")
+
+    if a.dtype != torch.float32 and a.dtype != torch.float64:
+        raise ValueError(f"a matrix must be float32 or float64")
+    
+    if not overwrite_a:
+        out = a.clone()
+    else:
+        out = a
+
+    ipiv = torch.zeros(a.size(0), device=a.device, dtype=torch.int64)
+    info = torch.scalar_tensor(-1, device=a.device, dtype=torch.int)
+
+    stream = cuda.current_stream()
+
+    SingletonClass().kernel.cusolverDnXgetrf_export(
+        out,
+        ipiv,
+        info, 
+        stream.cuda_stream,
+        verbose
+    )
+
+    cpu_info = info.cpu()
+    if cpu_info != 0:
+        raise ValueError(f"info of getrf is not equal to 0: {cpu_info}. Check cusolver docs")
+    
+    return out, ipiv
+
+def getrs(
+        a,
+        ipiv,
+        targets,
+        overwrite_targets,
+        verbose
+):
+
+    if not a.is_cuda:
+        raise ValueError(f"a is not on a device")
+
+    if a.dim() != 2:
+        raise ValueError(f"a matrix is not two dimensional")
+    
+    if a.shape[0] != a.shape[1]:
+        raise ValueError(f"a matrix must be square")
+
+    if a.dtype != torch.float32 and a.dtype != torch.float64:
+        raise ValueError(f"a matrix must be float32 or float64")
+    
+    if not targets.is_cuda:
+        raise ValueError(f"targets is not on a device")
+
+    if targets.dim() != 2:
+        raise ValueError(f"targets matrix is not two dimensional")
+    
+    if a.shape[0] != targets.shape[1]:
+        raise ValueError(f"the dimension of a does not match the dimension of b")
+
+    if targets.dtype != torch.float32 and targets.dtype != torch.float64:
+        raise ValueError(f"targets matrix must be float32 or float64")
+    
+    if a.dtype != targets.dtype:
+        raise ValueError(f"a dtype must match targets dtype")
+    
+    if not overwrite_targets:
+        out = targets.clone()
+    else:
+        out = targets
+
+    info = torch.scalar_tensor(-1, device=a.device, dtype=torch.int)
+
+    stream = cuda.current_stream()
+
+    SingletonClass().kernel.cusolverDnXgetrs_export(
+        a,
+        ipiv,
+        out,
+        info,
+        stream.cuda_stream,
+        verbose
+    )
+
+    cpu_info = info.cpu()
+    if cpu_info != 0:
+        raise ValueError(f"info of getrf is not equal to 0: {cpu_info}. Check cusolver docs")
+    
+    return out
+        
 #TODO: need to check triangle non-sense with row-major and strange strides
 #TODO: able to switch to eigenvalue only mode
 # On info from docs:
